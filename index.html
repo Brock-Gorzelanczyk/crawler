@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Web Crawler · BMG Capital</title>
 <meta name="description" content="The web crawler that reads SEC filings cover to cover. Join the waitlist for the generic version.">
@@ -137,7 +139,7 @@
               <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Hear first when the crawler opens up, plus new videos</span></div></label>
               <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Founding access <em class="tag paid">$100</em></b><span>Exclusive early access to the generic crawler: run it yourself on any SEC filing you want. One-time payment.</span></div></label>
             </div>
-            <p class="terms" id="terms">Founding access is a pre-order: the generic crawler is still being built. <span id="ship-line"></span> Payment is handled securely by Stripe; we never see your card.</p>
+            <p class="terms" id="terms">You get the generic crawler by email <span id="ship-line"></span> after you pay. Payment is handled securely by Stripe; we never see your card.</p>
           </fieldset>
 
           <div class="hp" aria-hidden="true"><label for="company">Company</label><input id="company" name="company" tabindex="-1" autocomplete="off"></div>
@@ -165,92 +167,6 @@
   </footer>
 </div>
 
-<script>
-// ---- Settings (see README.md) ----
-// Where sign-ups go: the Google Apps Script web app URL. Until it is set, the form says so instead of failing silently.
-const ENDPOINT = "";
-// Founding access checkout: the Stripe Payment Link for the $100 product (https://buy.stripe.com/...).
-const STRIPE_LINK = "";
-// The date you promise founding access ships by; past it, buyers can get a full refund. Shown on the page.
-const SHIP_BY = "";   // e.g. "March 31, 2027"
-const CONSENT_TEXT = "I agree to get texts and emails from BMG Capital about the web crawler at the number and address above, including by automated means. Up to 4 msgs/month. Consent is not a condition of purchase. Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
-
-document.getElementById("yr").textContent = new Date().getFullYear();
-const $ = id => document.getElementById(id);
-const form = $("wl");
-$("ship-line").textContent = SHIP_BY
-  ? `It ships by ${SHIP_BY}; if it doesn't, you can get a full refund.`
-  : "Full refund if it doesn't ship.";
-
-// the button and the pre-order terms follow the choice
-const tier = () => (form.querySelector("input[name=tier]:checked") || {}).value || "waitlist";
-function drawTier(){
-  const paid = tier() === "founding", btn = $("go");
-  $("terms").classList.toggle("on", paid);
-  btn.classList.toggle("paid", paid);
-  btn.textContent = paid ? "Continue to payment · $100" : "Join the waitlist";
-}
-form.addEventListener("change", e => { if (e.target.name === "tier") drawTier(); });
-drawTier();
-
-// US numbers: (555) 123-4567 as you type; stored as +15551234567
-function digits(s){ return (s || "").replace(/\D/g, ""); }
-function e164(raw){
-  let d = digits(raw);
-  if (/^\+/.test(raw.trim()) && !raw.trim().startsWith("+1")) return d.length >= 8 && d.length <= 15 ? "+" + d : null;   // non-US with country code
-  if (d.length === 11 && d[0] === "1") d = d.slice(1);
-  return d.length === 10 && /^[2-9]\d{2}[2-9]/.test(d) ? "+1" + d : null;
-}
-$("phone").addEventListener("input", e => {
-  const v = e.target.value; if (v.trim().startsWith("+") && !v.trim().startsWith("+1")) return;
-  let d = digits(v); if (d.length === 11 && d[0] === "1") d = d.slice(1); d = d.slice(0, 10);
-  e.target.value = d.length > 6 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : d.length > 3 ? `(${d.slice(0,3)}) ${d.slice(3)}` : d;
-  e.target.classList.remove("bad"); $("phone-hint").textContent = "";
-});
-$("email").addEventListener("input", e => { e.target.classList.remove("bad"); $("email-hint").textContent = ""; });
-const okEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s.trim());
-
-form.addEventListener("submit", async e => {
-  e.preventDefault();
-  $("formerr").textContent = "";
-  const phone = e164($("phone").value), email = $("email").value.trim().toLowerCase();
-  let bad = false;
-  if (!phone){ $("phone").classList.add("bad"); $("phone-hint").textContent = "Enter a 10-digit US number, or +country code."; bad = true; }
-  if (!okEmail(email)){ $("email").classList.add("bad"); $("email-hint").textContent = "Enter a valid email."; bad = true; }
-  if (!$("consent").checked){ $("formerr").textContent = "Tick the box to agree to texts and emails."; bad = true; }
-  if (bad) return;
-  if ($("company").value) { showDone(); return; }   // a bot filled the hidden field
-  const paid = tier() === "founding";
-  if (!ENDPOINT){ $("formerr").textContent = "Sign-ups aren't connected yet."; return; }
-  if (paid && !STRIPE_LINK){ $("formerr").textContent = "Founding access isn't open yet. Join the free waitlist for now."; return; }
-
-  const body = new URLSearchParams({
-    phone, email,
-    tier: paid ? "founding_checkout_started" : "waitlist",
-    consent: "yes", consent_text: CONSENT_TEXT,
-    source: new URLSearchParams(location.search).get("src") || (document.referrer ? new URL(document.referrer).hostname : "direct"),
-    page: location.href.split("?")[0],
-    tz: Intl.DateTimeFormat().resolvedOptions().timeZone || ""
-  });
-  const btn = $("go"); btn.disabled = true; btn.textContent = paid ? "Opening checkout..." : "Joining...";
-  try {
-    // the contact is saved first, so someone who leaves checkout is still on the list.
-    // Apps Script answers with a redirect that browsers block for reading; no-cors still delivers the row
-    await fetch(ENDPOINT, {method: "POST", mode: "no-cors", headers: {"Content-Type": "application/x-www-form-urlencoded"}, body});
-    if (paid) {
-      const u = new URL(STRIPE_LINK);
-      u.searchParams.set("prefilled_email", email);
-      u.searchParams.set("client_reference_id", phone.replace(/\D/g, ""));   // ties the payment to the sheet row
-      location.href = u.toString();
-      return;
-    }
-    showDone();
-  } catch (err) {
-    $("formerr").textContent = "Couldn't reach the server. Check your connection and try again.";
-    btn.disabled = false; drawTier();
-  }
-});
-function showDone(){ $("formwrap").style.display = "none"; $("done").classList.add("on"); }
-</script>
+<script src="app.js"></script>
 </body>
 </html>

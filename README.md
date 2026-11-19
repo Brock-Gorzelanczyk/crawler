@@ -3,15 +3,16 @@
 The TikTok bio landing page. A visitor leaves a phone number and an email, then picks one:
 
 - **Join the waitlist (free)**: saved as `waitlist`.
-- **Founding access ($100)**: saved as `founding_checkout_started`, then sent to Stripe checkout with their email filled in.
+- **Founding access ($100)**: saved on the Waitlist tab as "started $100 checkout", then sent to Stripe checkout. Stripe-confirmed payments land on the **Paid** tab (pulled from Stripe every 10 minutes), and the buyer's Waitlist row changes to "paid".
 
 Every contact goes into a Google Sheet you own, so someone who opens checkout and leaves is still on the list.
 
 | File | What it is |
 |---|---|
-| `index.html` | The page. Three settings at the top of its `<script>`: `ENDPOINT`, `STRIPE_LINK`, `SHIP_BY` |
-| `privacy.html` | Privacy notice the consent box links to. Put your contact email in it before launch |
-| `apps-script/Code.gs` | Saves sign-ups to the Sheet: one row per person, so repeats update the row instead of adding a copy |
+| `index.html` | The page (no inline script, so the Content-Security-Policy can block injected code) |
+| `app.js` | The form logic. Three settings at the top: `ENDPOINT`, `STRIPE_LINK`, `DELIVERY` |
+| `privacy.html` | Privacy notice the consent box links to. Contact: your Gmail |
+| `apps-script/Code.gs` | Saves sign-ups to the Waitlist tab (one row per person) and pulls Stripe-confirmed payments into the Paid tab |
 | `assets/` | The 7-second crawler loop (0.8 MB) and its poster frame |
 | `test/form_test.js` | End-to-end check (22 checks, phone and desktop) |
 
@@ -26,9 +27,13 @@ Every contact goes into a Google Sheet you own, so someone who opens checkout an
    - Who has access: **Anyone**.
 
    Click Deploy and allow access when Google asks.
-4. Copy the **Web app URL** (it ends in `/exec`). In `index.html`, set `const ENDPOINT = "<that URL>";`.
+4. Copy the **Web app URL** (it ends in `/exec`). In `app.js`, set `const ENDPOINT = "<that URL>";`.
 
-The first sign-up creates a `Signups` tab with these columns: first_seen, last_seen, phone, email, tier, paid, source, sms_email_consent, consent_text, page, timezone, times_submitted.
+Two tabs:
+- **Waitlist**: first_seen, last_seen, phone, email, tier (free / started $100 checkout / paid), source, sms_email_consent, consent_text, page, timezone, times_submitted.
+- **Paid**: paid_at, name, email, phone, amount, currency, stripe_session, payment_link, delivered. Only Stripe writes here (via `syncPaid`), so nobody can add themselves without paying. Mark `delivered` yourself after you email the crawler.
+
+Keep the Sheet private (don't share it); it holds phone numbers.
 
 ### 2. Stripe (the $100 founding access)
 
@@ -36,10 +41,15 @@ The first sign-up creates a `Signups` tab with these columns: first_seen, last_s
 2. Go to **Payment Links > New**, using that product.
    - Turn on **Collect customers' phone numbers**.
    - Under After payment, set a confirmation message that repeats the ship-by date.
-3. Copy the link (`https://buy.stripe.com/...`). In `index.html`, set `const STRIPE_LINK = "<link>";`.
-4. In `index.html`, set `const SHIP_BY = "<date>";`: the date you promise founding access ships by. The page shows it with the refund promise.
+3. Copy the link (`https://buy.stripe.com/...`). In `app.js`, set `const STRIPE_LINK = "<link>";`.
+4. In `app.js`, `const DELIVERY = "within 24 hours";` is the delivery promise shown on the page. Change it only if you can keep the new promise.
 
-To see who paid: each Stripe payment has **client_reference_id** set to the buyer's phone digits (e.g. `16465550123`), which matches the Sheet's phone column. Mark `paid` = yes on those rows.
+To fill the Paid tab:
+1. Stripe > Developers > API keys > **Create restricted key**. Name it "Crawler sheet". Set **Checkout Sessions: Read**, everything else None. Create it.
+2. In the Apps Script project: **Project Settings > Script properties > Add**: `STRIPE_KEY` = that `rk_...` key. Save. The key lives only there, never in this repo.
+3. In the editor, pick `setup` and click **Run** (allow access if asked). It makes both tabs and checks Stripe every 10 minutes.
+
+Test mode and live mode have separate links and keys. When you go live, swap both.
 
 ### 3. Put it online (free, GitHub Pages)
 
@@ -60,11 +70,12 @@ Export the Sheet (File > Download > CSV) and import it into a texting tool (e.g.
 
 ## Before you launch
 
-- [ ] `ENDPOINT`, `STRIPE_LINK` and `SHIP_BY` set in `index.html`.
+- [ ] `ENDPOINT` and the **live** `STRIPE_LINK` set in `app.js`; live `STRIPE_KEY` in Script properties.
+- [ ] Test rows deleted from the Waitlist tab.
 - [ ] Contact email set in `privacy.html`.
 - [ ] One real test sign-up on your phone shows up in the Sheet.
 - [ ] One test payment in Stripe test mode, then switch the link to live mode.
-- [ ] You're ready to deliver founding access by `SHIP_BY`, or to refund everyone who paid.
+- [ ] The generic crawler is built and ready to email, so every buyer gets it within the `DELIVERY` promise.
 
 ## Test
 

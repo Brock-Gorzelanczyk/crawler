@@ -11,13 +11,13 @@ let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); 
   for (const vp of [{width: 390, height: 844, name: 'phone'}, {width: 1280, height: 860, name: 'desktop'}]) {
     const ctx = await b.newContext({viewport: vp});
     const posts = [], errs = [];
-    await ctx.route(BASE + 'index.html*', async r => { const res = await r.fetch(); let t = await res.text();
-      t = t.replace('const ENDPOINT = "";', `const ENDPOINT = "${EP}";`).replace('const STRIPE_LINK = "";', `const STRIPE_LINK = "${STRIPE}";`).replace('const SHIP_BY = "";', 'const SHIP_BY = "March 31, 2027";');
+    await ctx.route(BASE + 'app.js*', async r => { const res = await r.fetch(); let t = await res.text();
+      t = t.replace(/const ENDPOINT = "[^"]*";/, `const ENDPOINT = "${EP}";`).replace(/const STRIPE_LINK = "[^"]*";/, `const STRIPE_LINK = "${STRIPE}";`);
       r.fulfill({response: res, body: t}); });
     await ctx.route(EP, r => { posts.push(Object.fromEntries(new URLSearchParams(r.request().postData()))); r.fulfill({status: 200, body: '{"ok":true}'}); });
     let stripeHit = null;
     await ctx.route(STRIPE + '**', r => { stripeHit = r.request().url(); r.fulfill({status: 200, contentType: 'text/html', body: '<h1>stripe stub</h1>'}); });
-    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(String(e)));
+    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error' && !/fonts.g/.test(m.text())) errs.push('console: ' + m.text()); });
     await p.goto(BASE + 'index.html?src=tiktok');
     await p.screenshot({path: `test/shot-${vp.name}.png`, fullPage: true});
     ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${vp.name}: no sideways scroll`);
@@ -38,13 +38,13 @@ let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); 
     // founding access: saves the contact, then goes to Stripe with the email and phone attached
     await p.goto(BASE + 'index.html?src=tiktok');
     await p.check('input[value=founding]');
-    ok(/\$100/.test(await p.textContent('#go')) && await p.isVisible('#terms') && /March 31, 2027/.test(await p.textContent('#terms')), `${vp.name}: $100 button and pre-order terms shown`);
+    ok(/\$100/.test(await p.textContent('#go')) && await p.isVisible('#terms') && /within 24 hours/.test(await p.textContent('#terms')), `${vp.name}: $100 button and pre-order terms shown`);
     await p.screenshot({path: `test/shot-${vp.name}-founding.png`});
     await p.fill('#phone', '+1 (646) 555-0123'); await p.fill('#email', 'buyer@example.com'); await p.check('#consent');
     await p.click('#go'); await p.waitForTimeout(800);
     const f = posts[1] || {};
     ok(f.tier === 'founding_checkout_started' && f.phone === '+16465550123', `${vp.name}: founding row saved before checkout`);
-    ok(!!stripeHit && stripeHit.includes('prefilled_email=buyer%40example.com') && stripeHit.includes('client_reference_id=16465550123'), `${vp.name}: Stripe opened ${stripeHit}`);
+    ok(stripeHit === STRIPE, `${vp.name}: Stripe opened with no email or phone in the address: ${stripeHit}`);
 
     // a bot that fills the hidden field is not saved
     await p.goto(BASE + 'index.html'); await p.evaluate(() => document.getElementById('company').value = 'spam');
