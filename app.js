@@ -84,10 +84,31 @@ form.addEventListener("submit", async e => {
 });
 function showDone(){ $("formwrap").style.display = "none"; $("done").classList.add("on"); }
 
-// tap a video to watch it full screen (iPhone Safari uses its own video player call)
-document.querySelectorAll("video[data-zoom]").forEach(v => v.addEventListener("click", () => {
-  try {
-    if (v.requestFullscreen) v.requestFullscreen().catch(() => {});
-    else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
-  } catch (e) {}
-}));
+// Videos: play while on screen. If the phone blocks autoplay (iPhone Low Power Mode, data saver),
+// show a "Tap to play" button; a tap is allowed to start playback. Tapping a playing video opens it full screen.
+const vids = Array.from(document.querySelectorAll("video[data-zoom]"));
+function tryPlay(v) {
+  v.muted = true;
+  const p = v.play();
+  if (p && p.then) p.then(() => v.parentElement.classList.remove("blocked"))
+                    .catch(() => v.parentElement.classList.add("blocked"));
+}
+vids.forEach(v => {
+  v.muted = true; v.defaultMuted = true; v.setAttribute("muted", "");
+  v.addEventListener("playing", () => v.parentElement.classList.remove("blocked"));
+  const btn = v.parentElement.querySelector(".play");
+  if (btn) btn.addEventListener("click", e => { e.stopPropagation(); tryPlay(v); });
+  v.addEventListener("click", () => {
+    if (v.paused) { tryPlay(v); return; }
+    try {
+      if (v.requestFullscreen) v.requestFullscreen().catch(() => {});
+      else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
+    } catch (e) {}
+  });
+});
+if ("IntersectionObserver" in window) {
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) tryPlay(e.target); else e.target.pause();
+  }), {threshold: 0.25});
+  vids.forEach(v => io.observe(v));
+} else vids.forEach(tryPlay);

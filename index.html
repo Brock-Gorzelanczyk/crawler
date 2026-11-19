@@ -100,7 +100,10 @@
   .done p{color:var(--muted);margin:0}
   .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
   footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
-  @media(prefers-reduced-motion:reduce){.phone video{display:none}.phone{background:url(assets/crawler-poster.jpg) center/cover}.screen video{display:none}.screen{background:url(assets/brain-poster.jpg) center/cover}}
+  .play{position:absolute;inset:0;margin:auto;width:max-content;height:max-content;display:none;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.25);
+    background:rgba(5,7,12,.78);color:#fff;font:700 15px Inter,system-ui,sans-serif;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .play::before{content:"";width:0;height:0;border-left:12px solid var(--cyan);border-top:8px solid transparent;border-bottom:8px solid transparent}
+  .blocked .play{display:inline-flex}
 </style>
 </head>
 <body>
@@ -141,14 +144,16 @@
       <div class="step">
         <p class="stepno"><span>1</span>The crawler reads the filing</p>
         <div class="phone">
-          <video id="crawl" data-zoom src="assets/crawler-read.mp4" poster="assets/crawler-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The web crawler reading Anthropic's S-1 filing, 0 to 24 figures, then its one-screen report"></video>
+          <video id="crawl" data-zoom src="assets/crawler-read.mp4" poster="assets/crawler-poster.jpg" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-label="The web crawler reading Anthropic's S-1 filing, 0 to 24 figures, then its one-screen report"></video>
+          <button type="button" class="play" aria-label="Play the crawler video">Tap to play</button>
         </div>
         <p class="phone-hint">Real read of Anthropic's S-1 · tap to expand</p>
       </div>
       <div class="step">
         <p class="stepno"><span>2</span>The brain connects it to everything else</p>
         <div class="screen">
-          <video id="brain" data-zoom src="assets/brain-tour.mp4" poster="assets/brain-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The brain: a heat map turns into a 3D map of companies, then each filing the crawler read is threaded into its company"></video>
+          <video id="brain" data-zoom src="assets/brain-tour.mp4" poster="assets/brain-poster.jpg" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-label="The brain: a heat map turns into a 3D map of companies, then each filing the crawler read is threaded into its company"></video>
+          <button type="button" class="play" aria-label="Play the brain video">Tap to play</button>
         </div>
         <p class="phone-hint">Each read threads into its company · tap to expand</p>
       </div>
