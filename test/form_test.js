@@ -38,7 +38,7 @@ let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); 
     // founding access: saves the contact, then goes to Stripe with the email and phone attached
     await p.goto(BASE + 'index.html?src=tiktok');
     await p.check('input[value=founding]');
-    ok(/\$100/.test(await p.textContent('#go')) && await p.isVisible('#terms') && /within 24 hours/.test(await p.textContent('#terms')), `${vp.name}: $100 button and pre-order terms shown`);
+    ok(/\$50/.test(await p.textContent('#go')) && await p.isVisible('#terms') && /within 24 hours/.test(await p.textContent('#terms')), `${vp.name}: $50 button and pre-order terms shown`);
     await p.screenshot({path: `test/shot-${vp.name}-founding.png`});
     await p.fill('#phone', '+1 (646) 555-0123'); await p.fill('#email', 'buyer@example.com'); await p.check('#consent');
     await p.click('#go'); await p.waitForTimeout(800);

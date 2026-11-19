@@ -3,7 +3,7 @@
 The TikTok bio landing page. A visitor leaves a phone number and an email, then picks one:
 
 - **Join the waitlist (free)**: saved as `waitlist`.
-- **Founding access ($100)**: saved on the Waitlist tab as "started $100 checkout", then sent to Stripe checkout. Stripe-confirmed payments land on the **Paid** tab (pulled from Stripe every 10 minutes), and the buyer's Waitlist row changes to "paid".
+- **Founding access ($50)**: the exact files for the crawler, its UI, the Obsidian brain and the 3D brain view, plus the build guide, no data. Saved on the Waitlist tab as "started $100 checkout" (the Sheet's label; the price is $50), then sent to Stripe checkout. Stripe-confirmed payments land on the **Paid** tab (pulled from Stripe every 10 minutes), and the buyer's Waitlist row changes to "paid".
 
 Every contact goes into a Google Sheet you own, so someone who opens checkout and leaves is still on the list.
 
@@ -35,9 +35,9 @@ Two tabs:
 
 Keep the Sheet private (don't share it); it holds phone numbers.
 
-### 2. Stripe (the $100 founding access)
+### 2. Stripe (the $50 founding access)
 
-1. In Stripe, go to **Product catalog > Add product**: "Web Crawler: Founding Access", $100, one-time.
+1. In Stripe, go to **Product catalog > Add product**: "Web Crawler: Founding Access", $50, one-time.
 2. Go to **Payment Links > New**, using that product.
    - Turn on **Collect customers' phone numbers**.
    - Under After payment, set a confirmation message that repeats the ship-by date.

@@ -27,9 +27,9 @@
   header{display:flex;align-items:center;gap:10px;margin-bottom:28px}
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.01em;text-decoration:none;color:var(--text)}
   .grid{display:grid;grid-template-columns:1fr;gap:28px;align-items:start}
-  .grid{grid-template-areas:"intro" "card" "show"}
-  .intro{grid-area:intro}.card{grid-area:card}.show{grid-area:show}
-  @media(min-width:860px){.grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);grid-template-areas:"intro card" "show card";gap:0 44px}}
+  .grid{grid-template-areas:"intro" "card" "show" "more"}
+  .intro{grid-area:intro}.card{grid-area:card}.show{grid-area:show}.more{grid-area:more}
+  @media(min-width:860px){.grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);grid-template-areas:"intro card" "show card" "more card";gap:0 44px}}
   .eyebrow{font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:0 0 14px}
   h1{font-weight:900;font-size:clamp(38px,8.5vw,64px);line-height:1;letter-spacing:-.035em;margin:0 0 16px}
   h1 em{font-style:normal;color:var(--cyan)}
@@ -40,6 +40,18 @@
   .phone{position:relative;width:min(340px,80vw);aspect-ratio:9/16;border-radius:28px;overflow:hidden;border:1px solid var(--line);
     box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 6px #0b0f15,0 0 60px rgba(111,244,255,.12);margin:6px auto 0;background:#000}
   .phone video{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+  .more{margin-top:44px;border-top:1px solid var(--line);padding-top:36px}
+  .more h2{font-size:clamp(26px,4.4vw,38px);font-weight:800;letter-spacing:-.02em;margin:4px 0 8px;line-height:1.1}
+  .more .lede{margin-bottom:22px}
+  .screen{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/9;
+    box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(255,61,166,.10)}
+  .screen video{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+  .gets{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:12px;grid-template-columns:1fr}
+  @media(min-width:640px){.gets{grid-template-columns:1fr 1fr}}
+  .gets li{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px}
+  .gets b{display:block;font-size:16px;margin-bottom:4px}
+  .gets span{color:#c9d1dc;font-size:14.5px;line-height:1.5}
+  .gets li.empty{border-color:rgba(255,61,166,.45)}
   .phone-hint{text-align:center;color:var(--muted);font:500 12px 'IBM Plex Mono',monospace;margin:12px 0 0}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px 18px}
   @media(min-width:860px){.card{padding:28px 26px;position:sticky;top:20px}}
@@ -86,7 +98,7 @@
   .done p{color:var(--muted);margin:0}
   .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
   footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
-  @media(prefers-reduced-motion:reduce){.phone video{display:none}.phone{background:url(assets/crawler-poster.jpg) center/cover}}
+  @media(prefers-reduced-motion:reduce){.phone video{display:none}.phone{background:url(assets/crawler-poster.jpg) center/cover}.screen video{display:none}.screen{background:url(assets/brain-poster.jpg) center/cover}}
 </style>
 </head>
 <body>
@@ -112,16 +124,34 @@
 
     <div class="show">
         <div class="phone">
-        <video id="crawl" src="assets/crawler-read.mp4" poster="assets/crawler-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="The web crawler reading Anthropic's S-1 filing, 0 to 24 figures, then its one-screen report"></video>
+        <video id="crawl" data-zoom src="assets/crawler-read.mp4" poster="assets/crawler-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="The web crawler reading Anthropic's S-1 filing, 0 to 24 figures, then its one-screen report"></video>
         </div>
         <p class="phone-hint">Real read of Anthropic's S-1 · tap to expand</p>
     </div>
+
+    <section class="more" aria-labelledby="more-h">
+      <p class="eyebrow">Founding access · $50</p>
+      <h2 id="more-h">The exact files I built it with, <em>minus my data.</em></h2>
+      <p class="lede">The crawler is half of it. Every filing it reads is fed into a brain: an Obsidian vault with a note for every company, linked to its peers, shown as a 3D map you can fly through. Founding access gets you the actual files behind all of it and exactly how I built it, so you can build your own.</p>
+      <div class="screen">
+        <video id="brain" data-zoom src="assets/brain-tour.mp4" poster="assets/brain-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The brain: a heat map turns into a 3D map of companies, then the Crawler tour threads each filing it read into its company"></video>
+      </div>
+      <p class="phone-hint">The brain, with the crawler feeding it · tap to expand</p>
+      <ul class="gets">
+        <li><b>The crawler</b><span>Reads a document end to end and tags every figure with the page it came from.</span></li>
+        <li><b>The crawler UI</b><span>The live view from the videos: the spider walking the page and the report building as it reads.</span></li>
+        <li><b>The Obsidian brain</b><span>A note for every company, linked to its peers and to every read. The crawler writes into it as it goes.</span></li>
+        <li><b>The 3D brain view</b><span>The heat map, sectors, comp lines and the Crawler tour you see above.</span></li>
+        <li><b>Exactly how I built it</b><span>Step by step, in the order I built it. Set it up for SEC filings like mine, or point it at whatever you want.</span></li>
+        <li class="empty"><b>Starts empty</b><span>None of my data comes with it: no companies, notes, reads or research. What you put in stays yours.</span></li>
+      </ul>
+    </section>
 
     <section class="card" id="join">
       <div id="formwrap">
         <div class="count"><i></i>Waitlist open</div>
         <h2>Get early access</h2>
-        <p class="sub">A generic version of the crawler is coming. Join the free list, or lock in founding access for $100.</p>
+        <p class="sub">Join the free list, or get founding access for $50: the exact files behind the crawler and the brain, and how I built them.</p>
 
         <form id="wl" novalidate>
           <div class="field">
@@ -139,9 +169,9 @@
             <legend>Pick one</legend>
             <div class="opts">
               <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Hear first when the crawler opens up, plus new videos</span></div></label>
-              <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Founding access <em class="tag paid">$100</em></b><span>Exclusive early access to the generic crawler: run it yourself on any SEC filing you want. One-time payment.</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Founding access <em class="tag paid">$50</em></b><span>The exact files I built everything here with: the crawler, its UI, the Obsidian brain and the 3D view, plus exactly how I built it. For SEC filings like mine, or whatever you choose. Minus my data. One-time payment.</span></div></label>
             </div>
-            <p class="terms" id="terms">You get the generic crawler by email <span id="ship-line"></span> after you pay. Payment is handled securely by Stripe; we never see your card.</p>
+            <p class="terms" id="terms">You get the files by email <span id="ship-line"></span> after you pay: the code for the crawler and the brain, the UI, and the step-by-step guide to build it. It starts empty: none of my companies, notes or reads are included. Payment is handled securely by Stripe; we never see your card.</p>
           </fieldset>
 
           <div class="hp" aria-hidden="true"><label for="company">Company</label><input id="company" name="company" tabindex="-1" autocomplete="off"></div>

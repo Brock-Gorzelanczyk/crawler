@@ -5,8 +5,8 @@ if (window.top !== window.self) { try { window.top.location = window.location.hr
 // ---- Settings (see README.md) ----
 // Where sign-ups go: the Google Apps Script web app URL. Until it is set, the form says so instead of failing silently.
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbxHdsnal13aemM0TY9q9-XC2QKrVZQSOW1f_0dDlLeZuQCJOMs3L9LgKoj0UFtCmP0b/exec";
-// Founding access checkout: the Stripe Payment Link for the $100 product (https://buy.stripe.com/...).
-const STRIPE_LINK = "https://buy.stripe.com/4gMbJ17AYaBK8Ft8EVfMA00";
+// Founding access checkout: the Stripe Payment Link for the $50 product (https://buy.stripe.com/...).
+const STRIPE_LINK = "https://buy.stripe.com/aFa7sL1cAcJSg7V6wNfMA01";
 // How soon a buyer gets the generic crawler after paying. Shown on the page.
 const DELIVERY = "within 24 hours";
 const CONSENT_TEXT = "I agree to get texts and emails from BMG Capital about the web crawler at the number and address above, including by automated means. Up to 4 msgs/month. Consent is not a condition of purchase. Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
@@ -22,7 +22,7 @@ function drawTier(){
   const paid = tier() === "founding", btn = $("go");
   $("terms").classList.toggle("on", paid);
   btn.classList.toggle("paid", paid);
-  btn.textContent = paid ? "Continue to payment · $100" : "Join the waitlist";
+  btn.textContent = paid ? "Continue to payment · $50" : "Join the waitlist";
 }
 form.addEventListener("change", e => { if (e.target.name === "tier") drawTier(); });
 drawTier();
@@ -84,11 +84,10 @@ form.addEventListener("submit", async e => {
 });
 function showDone(){ $("formwrap").style.display = "none"; $("done").classList.add("on"); }
 
-// tap the crawler video to watch it full screen (iPhone Safari uses its own video player call)
-const crawl = document.getElementById("crawl");
-if (crawl) crawl.addEventListener("click", () => {
+// tap a video to watch it full screen (iPhone Safari uses its own video player call)
+document.querySelectorAll("video[data-zoom]").forEach(v => v.addEventListener("click", () => {
   try {
-    if (crawl.requestFullscreen) crawl.requestFullscreen().catch(() => {});
-    else if (crawl.webkitEnterFullscreen) crawl.webkitEnterFullscreen();
+    if (v.requestFullscreen) v.requestFullscreen().catch(() => {});
+    else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
   } catch (e) {}
-});
+}));
