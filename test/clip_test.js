@@ -18,6 +18,7 @@ async function page(browser, ctxOpts, init) {
 }
 const moving = async (p, id) => { const el = p.locator('#' + id); await el.scrollIntoViewIfNeeded(); await p.waitForTimeout(700);
   const a = await el.screenshot(); await p.waitForTimeout(1200); const b = await el.screenshot(); return !a.equals(b); };
+const swapped = (p, id) => p.waitForFunction(id => document.getElementById(id).tagName === 'IMG', id, {timeout: 20000}).catch(() => {});
 const info = (p, id) => p.evaluate(id => { const e = document.getElementById(id); return {tag: e.tagName, src: (e.currentSrc || e.src || '').replace(/^.*\//, '').slice(0, 40), paused: e.paused, fs: !!(document.fullscreenElement || e.webkitDisplayingFullscreen)}; }, id);
 
 (async () => {
@@ -47,9 +48,9 @@ const info = (p, id) => p.evaluate(id => { const e = document.getElementById(id)
     const p2 = await page(b, {...android}, () => { HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException('blocked', 'NotAllowedError')); };
       Object.defineProperty(HTMLMediaElement.prototype, 'autoplay', {get() { return false; }, set() {}});
       const sa = Element.prototype.setAttribute; Element.prototype.setAttribute = function (k, v) { if (this instanceof HTMLMediaElement && k === 'autoplay') return; return sa.call(this, k, v); }; });
-    await p2.waitForTimeout(6000);
+    await swapped(p2, 'crawl');   // 4 s on screen without playing, then the WebP downloads (about 10 MB)
     let i = await info(p2, 'crawl'); ok(i.tag === 'IMG' && /\.webp/.test(i.src) && await moving(p2, 'crawl'), `Android, autoplay blocked: crawler falls back to WebP ${JSON.stringify(i)}`);
-    await p2.locator('#brain').scrollIntoViewIfNeeded(); await p2.waitForTimeout(6000);
+    await p2.locator('#brain').scrollIntoViewIfNeeded(); await swapped(p2, 'brain');
     i = await info(p2, 'brain'); ok(i.tag === 'IMG' && /\.webp/.test(i.src) && await moving(p2, 'brain'), `Android, autoplay blocked: brain falls back to WebP ${JSON.stringify(i)}`);
     const p3 = await page(b, {...android}); await p3.waitForTimeout(2000);
     await p3.evaluate(() => { const x = document.createElement('button'); x.id = 'fsx'; x.textContent = 'fs'; x.style.cssText = 'position:fixed;top:0;left:0;z-index:99'; x.onclick = () => document.getElementById('crawl').requestFullscreen().catch(() => {}); document.body.append(x); });
