@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Web Crawler · BMG Capital</title>
+<meta name="description" content="The web crawler that reads SEC filings cover to cover. Join the waitlist for the generic version.">
+<meta property="og:title" content="The Web Crawler · BMG Capital">
+<meta property="og:description" content="It reads SEC filings cover to cover and pulls out every number. Join the waitlist.">
+<meta property="og:image" content="assets/crawler-poster.jpg">
+<meta name="theme-color" content="#05070c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05070c; --panel:#0d1118; --line:#1d2531; --text:#eef2f7; --muted:#8b95a5;
+    --cyan:#6ff4ff; --pink:#ff3da6; --green:#2fdc74; --err:#ff6b6b;
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--cyan)}
+  .wrap{max-width:1040px;margin:0 auto;padding:20px 16px 40px}
+  header{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.01em;text-decoration:none;color:var(--text)}
+  .grid{display:grid;grid-template-columns:1fr;gap:28px;align-items:start}
+  .grid{grid-template-areas:"intro" "card" "show"}
+  .intro{grid-area:intro}.card{grid-area:card}.show{grid-area:show}
+  @media(min-width:860px){.grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);grid-template-areas:"intro card" "show card";gap:0 44px}}
+  .eyebrow{font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:0 0 14px}
+  h1{font-weight:900;font-size:clamp(38px,8.5vw,64px);line-height:1;letter-spacing:-.035em;margin:0 0 16px}
+  h1 em{font-style:normal;color:var(--cyan)}
+  .lede{font-size:18px;color:#c9d1dc;margin:0 0 22px;max-width:34em}
+  .facts{list-style:none;padding:0;margin:0 0 4px;display:grid;gap:10px}
+  .facts li{display:flex;gap:10px;align-items:flex-start;color:#c9d1dc}
+  .facts li::before{content:"";flex:none;width:8px;height:8px;margin-top:8px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink)}
+  .phone{position:relative;width:min(280px,72vw);aspect-ratio:9/16;border-radius:28px;overflow:hidden;border:1px solid var(--line);
+    box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 6px #0b0f15,0 0 60px rgba(111,244,255,.12);margin:6px auto 0;background:#000}
+  .phone video{width:100%;height:100%;object-fit:cover;display:block}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px 18px}
+  @media(min-width:860px){.card{padding:28px 26px;position:sticky;top:20px}}
+  .card h2{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+  .card .sub{color:var(--muted);margin:0 0 18px;font-size:15px}
+  .count{display:inline-flex;align-items:center;gap:8px;font:600 12px 'IBM Plex Mono',monospace;color:var(--green);margin-bottom:12px}
+  .count i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+  label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
+  .field{margin-bottom:14px}
+  input[type=tel],input[type=email],select{width:100%;height:50px;border-radius:12px;border:1px solid #2a3442;background:#070a10;color:var(--text);
+    font:500 17px Inter,sans-serif;padding:0 14px;outline:none;transition:border-color .15s, box-shadow .15s;-webkit-appearance:none;appearance:none}
+  select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+    background-position:calc(100% - 20px) 21px,calc(100% - 15px) 21px;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
+  input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(111,244,255,.18)}
+  input.bad{border-color:var(--err)}
+  .hint{font-size:13px;color:var(--err);margin-top:6px;min-height:0}
+  fieldset{border:0;padding:0;margin:4px 0 14px}
+  legend{font-weight:600;font-size:14px;margin-bottom:8px;padding:0}
+  .opts{display:grid;gap:8px}
+  .opt{display:flex;gap:12px;align-items:flex-start;border:1px solid #2a3442;border-radius:12px;padding:12px 14px;cursor:pointer;background:#070a10;transition:border-color .15s,background .15s}
+  .opt:has(input:checked){border-color:var(--cyan);background:rgba(111,244,255,.06)}
+  .opt input{margin:3px 0 0;accent-color:var(--cyan);width:18px;height:18px;flex:none}
+  .opt b{display:block;font-size:15px}
+  .opt span{display:block;color:var(--muted);font-size:13px}
+  .tag{font:600 12px 'IBM Plex Mono',monospace;font-style:normal;margin-left:6px;padding:2px 7px;border-radius:6px;vertical-align:1px}
+  .tag.free{color:var(--green);background:rgba(47,220,116,.12)}
+  .tag.paid{color:#fff;background:rgba(255,61,166,.22)}
+  .opt:has(input[value=founding]:checked){border-color:var(--pink);background:rgba(255,61,166,.07)}
+  .opt input[value=founding]{accent-color:var(--pink)}
+  .terms{display:none;font-size:12.5px;color:var(--muted);margin:10px 2px 0;line-height:1.45}
+  .terms.on{display:block}
+  button.paid{background:var(--pink);color:#fff;box-shadow:0 10px 30px rgba(255,61,166,.3)}
+  .consent{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.45;color:var(--muted);margin:6px 0 16px}
+  .consent input{margin-top:2px;accent-color:var(--cyan);width:18px;height:18px;flex:none}
+  button{width:100%;height:54px;border:0;border-radius:12px;background:var(--cyan);color:#00202a;font:800 18px Inter,sans-serif;cursor:pointer;
+    box-shadow:0 10px 30px rgba(111,244,255,.25);transition:transform .08s, filter .15s}
+  button:hover{filter:brightness(1.05)} button:active{transform:translateY(1px)}
+  button:disabled{opacity:.6;cursor:default}
+  .formerr{color:var(--err);font-size:14px;margin:10px 0 0;min-height:0}
+  .done{display:none;text-align:center;padding:12px 0}
+  .done.on{display:block}
+  .done .big{font-size:44px;line-height:1;margin-bottom:10px}
+  .done h3{font-size:22px;margin:0 0 6px}
+  .done p{color:var(--muted);margin:0}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
+  @media(prefers-reduced-motion:reduce){.phone video{display:none}.phone{background:url(assets/crawler-poster.jpg) center/cover}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="./" aria-label="BMG Capital">
+      <svg width="30" height="22" viewBox="0 0 30 22" aria-hidden="true"><path d="M2 19 L11 10.5 L16.5 15 L26 5" fill="none" stroke="#6ff4ff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="5" r="3.8" fill="#6ff4ff"/></svg>
+      BMG Capital
+    </a>
+  </header>
+
+  <div class="grid">
+    <section class="intro">
+      <p class="eyebrow">As seen on TikTok</p>
+      <h1>The <em>web crawler</em> that reads SEC filings for you.</h1>
+      <p class="lede">It crawls a 10-K, 10-Q or IPO filing from the cover page to the last line and pulls out every number that matters, with the page it came from.</p>
+      <ul class="facts">
+        <li>Reads the whole filing, not a summary of it</li>
+        <li>Every figure is tagged with its page number</li>
+        <li>Ends on a one-screen report of what it found</li>
+      </ul>
+    </section>
+
+    <div class="show">
+        <div class="phone">
+        <video src="assets/crawler-loop.mp4" poster="assets/crawler-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The web crawler reading Anthropic's S-1 filing"></video>
+        </div>
+    </div>
+
+    <section class="card" id="join">
+      <div id="formwrap">
+        <div class="count"><i></i>Waitlist open</div>
+        <h2>Get early access</h2>
+        <p class="sub">A generic version of the crawler is coming. Join the free list, or lock in founding access for $100.</p>
+
+        <form id="wl" novalidate>
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 123-4567" required>
+            <div class="hint" id="phone-hint" aria-live="polite"></div>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
+            <div class="hint" id="email-hint" aria-live="polite"></div>
+          </div>
+
+          <fieldset>
+            <legend>Pick one</legend>
+            <div class="opts">
+              <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Hear first when the crawler opens up, plus new videos</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Founding access <em class="tag paid">$100</em></b><span>Exclusive early access to the generic crawler: run it yourself on any SEC filing you want. One-time payment.</span></div></label>
+            </div>
+            <p class="terms" id="terms">Founding access is a pre-order: the generic crawler is still being built. <span id="ship-line"></span> Payment is handled securely by Stripe; we never see your card.</p>
+          </fieldset>
+
+          <div class="hp" aria-hidden="true"><label for="company">Company</label><input id="company" name="company" tabindex="-1" autocomplete="off"></div>
+
+          <label class="consent"><input type="checkbox" id="consent" name="consent" required>
+            <span>I agree to get texts and emails from BMG Capital about the web crawler at the number and address above, including by automated means. Up to 4 msgs/month. Consent is not a condition of purchase. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. See the <a href="privacy.html">privacy notice</a>.</span>
+          </label>
+
+          <button type="submit" id="go">Join the waitlist</button>
+          <p class="formerr" id="formerr" role="alert"></p>
+        </form>
+      </div>
+
+      <div class="done" id="done" aria-live="polite">
+        <div class="big">🕷️</div>
+        <h3>You're on the list.</h3>
+        <p>We'll text you when the crawler opens up.</p>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <span>© <span id="yr"></span> BMG Capital · Not investment advice.</span>
+    <a href="privacy.html">Privacy</a>
+  </footer>
+</div>
+
+<script>
+// ---- Settings (see README.md) ----
+// Where sign-ups go: the Google Apps Script web app URL. Until it is set, the form says so instead of failing silently.
+const ENDPOINT = "";
+// Founding access checkout: the Stripe Payment Link for the $100 product (https://buy.stripe.com/...).
+const STRIPE_LINK = "";
+// The date you promise founding access ships by; past it, buyers can get a full refund. Shown on the page.
+const SHIP_BY = "";   // e.g. "March 31, 2027"
+const CONSENT_TEXT = "I agree to get texts and emails from BMG Capital about the web crawler at the number and address above, including by automated means. Up to 4 msgs/month. Consent is not a condition of purchase. Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
+
+document.getElementById("yr").textContent = new Date().getFullYear();
+const $ = id => document.getElementById(id);
+const form = $("wl");
+$("ship-line").textContent = SHIP_BY
+  ? `It ships by ${SHIP_BY}; if it doesn't, you can get a full refund.`
+  : "Full refund if it doesn't ship.";
+
+// the button and the pre-order terms follow the choice
+const tier = () => (form.querySelector("input[name=tier]:checked") || {}).value || "waitlist";
+function drawTier(){
+  const paid = tier() === "founding", btn = $("go");
+  $("terms").classList.toggle("on", paid);
+  btn.classList.toggle("paid", paid);
+  btn.textContent = paid ? "Continue to payment · $100" : "Join the waitlist";
+}
+form.addEventListener("change", e => { if (e.target.name === "tier") drawTier(); });
+drawTier();
+
+// US numbers: (555) 123-4567 as you type; stored as +15551234567
+function digits(s){ return (s || "").replace(/\D/g, ""); }
+function e164(raw){
+  let d = digits(raw);
+  if (/^\+/.test(raw.trim()) && !raw.trim().startsWith("+1")) return d.length >= 8 && d.length <= 15 ? "+" + d : null;   // non-US with country code
+  if (d.length === 11 && d[0] === "1") d = d.slice(1);
+  return d.length === 10 && /^[2-9]\d{2}[2-9]/.test(d) ? "+1" + d : null;
+}
+$("phone").addEventListener("input", e => {
+  const v = e.target.value; if (v.trim().startsWith("+") && !v.trim().startsWith("+1")) return;
+  let d = digits(v); if (d.length === 11 && d[0] === "1") d = d.slice(1); d = d.slice(0, 10);
+  e.target.value = d.length > 6 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : d.length > 3 ? `(${d.slice(0,3)}) ${d.slice(3)}` : d;
+  e.target.classList.remove("bad"); $("phone-hint").textContent = "";
+});
+$("email").addEventListener("input", e => { e.target.classList.remove("bad"); $("email-hint").textContent = ""; });
+const okEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s.trim());
+
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  $("formerr").textContent = "";
+  const phone = e164($("phone").value), email = $("email").value.trim().toLowerCase();
+  let bad = false;
+  if (!phone){ $("phone").classList.add("bad"); $("phone-hint").textContent = "Enter a 10-digit US number, or +country code."; bad = true; }
+  if (!okEmail(email)){ $("email").classList.add("bad"); $("email-hint").textContent = "Enter a valid email."; bad = true; }
+  if (!$("consent").checked){ $("formerr").textContent = "Tick the box to agree to texts and emails."; bad = true; }
+  if (bad) return;
+  if ($("company").value) { showDone(); return; }   // a bot filled the hidden field
+  const paid = tier() === "founding";
+  if (!ENDPOINT){ $("formerr").textContent = "Sign-ups aren't connected yet."; return; }
+  if (paid && !STRIPE_LINK){ $("formerr").textContent = "Founding access isn't open yet. Join the free waitlist for now."; return; }
+
+  const body = new URLSearchParams({
+    phone, email,
+    tier: paid ? "founding_checkout_started" : "waitlist",
+    consent: "yes", consent_text: CONSENT_TEXT,
+    source: new URLSearchParams(location.search).get("src") || (document.referrer ? new URL(document.referrer).hostname : "direct"),
+    page: location.href.split("?")[0],
+    tz: Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+  });
+  const btn = $("go"); btn.disabled = true; btn.textContent = paid ? "Opening checkout..." : "Joining...";
+  try {
+    // the contact is saved first, so someone who leaves checkout is still on the list.
+    // Apps Script answers with a redirect that browsers block for reading; no-cors still delivers the row
+    await fetch(ENDPOINT, {method: "POST", mode: "no-cors", headers: {"Content-Type": "application/x-www-form-urlencoded"}, body});
+    if (paid) {
+      const u = new URL(STRIPE_LINK);
+      u.searchParams.set("prefilled_email", email);
+      u.searchParams.set("client_reference_id", phone.replace(/\D/g, ""));   // ties the payment to the sheet row
+      location.href = u.toString();
+      return;
+    }
+    showDone();
+  } catch (err) {
+    $("formerr").textContent = "Couldn't reach the server. Check your connection and try again.";
+    btn.disabled = false; drawTier();
+  }
+});
+function showDone(){ $("formwrap").style.display = "none"; $("done").classList.add("on"); }
+</script>
+</body>
+</html>
