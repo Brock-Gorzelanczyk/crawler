@@ -98,13 +98,6 @@ function tryPlay(v) {
 vids.forEach(v => {
   v.muted = true; v.defaultMuted = true; v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
   ["loadedmetadata", "canplay", "canplaythrough"].forEach(ev => v.addEventListener(ev, () => { if (visible(v) && v.paused) tryPlay(v); }));
-  v.addEventListener("click", () => {
-    if (v.paused) { tryPlay(v); return; }
-    try {
-      if (v.requestFullscreen) v.requestFullscreen().catch(() => {});
-      else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
-    } catch (e) {}
-  });
 });
 setInterval(() => vids.forEach(v => { if (visible(v) && v.paused) tryPlay(v); }), 1500);
 const unlock = () => vids.forEach(v => { if (visible(v)) tryPlay(v); });

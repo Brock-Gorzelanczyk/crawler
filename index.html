@@ -6,9 +6,9 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Crawler and the Brain · BMG Capital</title>
-<meta name="description" content="A web crawler that reads SEC filings and an Obsidian brain that remembers them. Join the waitlist or get the blueprint.">
+<meta name="description" content="A web crawler that reads any document cover to cover, tags every number to its page, and feeds an Obsidian brain that connects every read. Join the waitlist or get the blueprint.">
 <meta property="og:title" content="The Crawler and the Brain · BMG Capital">
-<meta property="og:description" content="A web crawler that reads SEC filings and a brain that remembers them. Get the blueprint.">
+<meta property="og:description" content="A crawler that reads any document cover to cover and a brain that connects every read. Get the blueprint.">
 <meta property="og:image" content="assets/crawler-poster.jpg?v=7e10184f">
 <meta name="theme-color" content="#05070c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,7 +39,7 @@
   .facts li::before{content:"";flex:none;width:8px;height:8px;margin-top:8px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink)}
   .phone{position:relative;width:min(340px,80vw);aspect-ratio:9/16;border-radius:28px;overflow:hidden;border:1px solid var(--line);
     box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 6px #0b0f15,0 0 60px rgba(111,244,255,.12);margin:6px auto 0;background:#000}
-  .phone video{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+  .phone video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
   .found{margin-top:36px;border-top:1px solid var(--line);padding-top:32px}
   .how{margin-top:4px}
   .lede.short{margin-bottom:0}
@@ -51,7 +51,7 @@
   .stepno span{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--cyan);color:#001a22;font:700 14px 'IBM Plex Mono',monospace}
   .screen{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/9;
     box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(255,61,166,.10)}
-  .screen video{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+  .screen video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
   .gets{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:10px;grid-template-columns:1fr}
   @media(min-width:640px){.gets{grid-template-columns:1fr 1fr 1fr}}
   .gets li{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px}
@@ -125,25 +125,25 @@
     <section class="intro">
       <p class="eyebrow">As seen on TikTok</p>
       <h1>The <em>crawler</em> reads it. The <em>brain</em> remembers it.</h1>
-      <p class="lede short">A web crawler that reads SEC filings page by page, feeding an Obsidian brain that connects everything it reads.</p>
+      <p class="lede short">A web crawler that reads any document cover to cover, tags every number with the page it came from, and feeds each read into an Obsidian brain that connects it to everything else.</p>
     </section>
 
 
 
     <section class="how" aria-label="The crawler and the brain at work">
       <div class="step">
-        <p class="stepno"><span>1</span>The crawler reads the filing</p>
+        <p class="stepno"><span>1</span>The crawler reads the whole thing, every number tagged to its page</p>
         <div class="phone">
-          <video id="crawl" data-zoom src="assets/crawler-read.mp4?v=863831ea" poster="assets/crawler-poster.jpg?v=7e10184f" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-label="The web crawler reading Anthropic's S-1 filing, 0 to 24 figures, then its one-screen report"></video>
+          <video id="crawl" data-zoom src="assets/crawler-read.mp4?v=863831ea" poster="assets/crawler-poster.jpg?v=7e10184f" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-label="The web crawler reading a document from the first page to the last, tagging each number with its page, then its one-screen report"></video>
         </div>
-        <p class="phone-hint">Real read of Anthropic's S-1 · tap to expand</p>
+        <p class="phone-hint">Example read: Anthropic's S-1</p>
       </div>
       <div class="step">
-        <p class="stepno"><span>2</span>The brain connects it to everything else</p>
+        <p class="stepno"><span>2</span>Every read connects into the brain</p>
         <div class="screen">
-          <video id="brain" data-zoom src="assets/brain-tour.mp4?v=6ab9d20a" poster="assets/brain-poster.jpg?v=20bfa9a6" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-label="The brain: a heat map turns into a 3D map of companies, then each filing the crawler read is threaded into its company"></video>
+          <video id="brain" data-zoom src="assets/brain-tour.mp4?v=6ab9d20a" poster="assets/brain-poster.jpg?v=20bfa9a6" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-label="The brain: a heat map turns into a 3D map of companies, then each document the crawler read is threaded into everything it connects to"></video>
         </div>
-        <p class="phone-hint">Each read threads into its company · tap to expand</p>
+        <p class="phone-hint">Each read threads into everything it touches</p>
       </div>
     </section>
 
@@ -204,7 +204,7 @@
     <section class="found" aria-labelledby="found-h">
       <p class="eyebrow">Founding access · $50</p>
       <h2 id="found-h">Get the blueprint.</h2>
-      <p class="lede">Everything you need to set up exactly what I set up: the files and the step-by-step guide. Use it for SEC filings like I do, or point it at anything you want.</p>
+      <p class="lede">Everything you need to set up exactly what I set up: the files and the step-by-step guide. Point it at whatever you want read: filings, reports, research, contracts, anything.</p>
       <ul class="gets">
         <li><b>The crawler</b><span>And the live view you see in the videos.</span></li>
         <li><b>The Obsidian brain</b><span>And the 3D map it powers.</span></li>
@@ -219,6 +219,6 @@
   </footer>
 </div>
 
-<script src="app.js?v=d3b46f5a"></script>
+<script src="app.js?v=80b8d7db"></script>
 </body>
 </html>
