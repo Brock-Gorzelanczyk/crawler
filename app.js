@@ -6,7 +6,7 @@ if (window.top !== window.self) { try { window.top.location = window.location.hr
 // Where sign-ups go: the Google Apps Script web app URL. Until it is set, the form says so instead of failing silently.
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbxHdsnal13aemM0TY9q9-XC2QKrVZQSOW1f_0dDlLeZuQCJOMs3L9LgKoj0UFtCmP0b/exec";
 // Founding access checkout: the Stripe Payment Link for the $100 product (https://buy.stripe.com/...).
-const STRIPE_LINK = "https://buy.stripe.com/test_4gMbJ17AYaBK8Ft8EVfMA00";
+const STRIPE_LINK = "https://buy.stripe.com/4gMbJ17AYaBK8Ft8EVfMA00";
 // How soon a buyer gets the generic crawler after paying. Shown on the page.
 const DELIVERY = "within 24 hours";
 const CONSENT_TEXT = "I agree to get texts and emails from BMG Capital about the web crawler at the number and address above, including by automated means. Up to 4 msgs/month. Consent is not a condition of purchase. Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
