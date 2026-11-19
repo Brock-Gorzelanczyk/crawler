@@ -27,9 +27,9 @@
   header{display:flex;align-items:center;gap:10px;margin-bottom:28px}
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.01em;text-decoration:none;color:var(--text)}
   .grid{display:grid;grid-template-columns:1fr;gap:28px;align-items:start}
-  .grid{grid-template-areas:"intro" "found" "card" "how"}
+  .grid{grid-template-areas:"intro" "how" "card" "found"}
   .intro{grid-area:intro}.card{grid-area:card}.found{grid-area:found}.how{grid-area:how}
-  @media(min-width:860px){.grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);grid-template-areas:"intro card" "found card" "how card";gap:0 44px}}
+  @media(min-width:860px){.grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);grid-template-areas:"intro card" "how card" "found card";gap:0 44px}}
   .eyebrow{font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:0 0 14px}
   h1{font-weight:900;font-size:clamp(38px,8.5vw,64px);line-height:1;letter-spacing:-.035em;margin:0 0 16px}
   h1 em{font-style:normal;color:var(--cyan)}
@@ -40,10 +40,13 @@
   .phone{position:relative;width:min(340px,80vw);aspect-ratio:9/16;border-radius:28px;overflow:hidden;border:1px solid var(--line);
     box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 6px #0b0f15,0 0 60px rgba(111,244,255,.12);margin:6px auto 0;background:#000}
   .phone video{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
-  .found,.how{margin-top:36px;border-top:1px solid var(--line);padding-top:32px}
+  .found{margin-top:36px;border-top:1px solid var(--line);padding-top:32px}
+  .how{margin-top:4px}
+  .lede.short{margin-bottom:0}
   .found h2,.how h2{font-size:clamp(26px,4.4vw,38px);font-weight:800;letter-spacing:-.02em;margin:4px 0 10px;line-height:1.1}
   .found .lede{margin-bottom:0}
-  .step{margin-top:26px}
+  .step{margin-top:22px}
+  .step:first-child{margin-top:0}
   .stepno{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;margin:0 0 14px}
   .stepno span{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--cyan);color:#001a22;font:700 14px 'IBM Plex Mono',monospace}
   .screen{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/9;
@@ -72,6 +75,13 @@
   .hint{font-size:13px;color:var(--err);margin-top:6px;min-height:0}
   fieldset{border:0;padding:0;margin:4px 0 14px}
   legend{font-weight:600;font-size:14px;margin-bottom:8px;padding:0}
+  .vs{width:100%;border-collapse:collapse;margin:2px 0 12px;font-size:13.5px}
+  .vs th{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;padding:0 4px 6px;width:46px}
+  .vs th:first-child{width:auto}
+  .vs td{padding:7px 4px;border-top:1px solid #1d2531;color:#c9d1dc;text-align:center}
+  .vs td:first-child{text-align:left}
+  .vs td:nth-child(2){color:var(--muted)}
+  .vs .pd{color:var(--pink);font-weight:700}
   .opts{display:grid;gap:8px}
   .opt{display:flex;gap:12px;align-items:flex-start;border:1px solid #2a3442;border-radius:12px;padding:12px 14px;cursor:pointer;background:#070a10;transition:border-color .15s,background .15s}
   .opt:has(input:checked){border-color:var(--cyan);background:rgba(111,244,255,.06)}
@@ -100,10 +110,6 @@
   .done p{color:var(--muted);margin:0}
   .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
   footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
-  .play{position:absolute;inset:0;margin:auto;width:max-content;height:max-content;display:none;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.25);
-    background:rgba(5,7,12,.78);color:#fff;font:700 15px Inter,system-ui,sans-serif;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .play::before{content:"";width:0;height:0;border-left:12px solid var(--cyan);border-top:8px solid transparent;border-bottom:8px solid transparent}
-  .blocked .play{display:inline-flex}
 </style>
 </head>
 <body>
@@ -119,33 +125,16 @@
     <section class="intro">
       <p class="eyebrow">As seen on TikTok</p>
       <h1>The <em>crawler</em> reads it. The <em>brain</em> remembers it.</h1>
-      <p class="lede">A web crawler reads an SEC filing from the first page to the last and pulls out every number, with the page it came from. Everything it reads goes into an Obsidian brain that links each company to its peers, which you can fly through in 3D.</p>
-      <ul class="facts">
-        <li>Reads the whole filing, not a summary</li>
-        <li>Every number tagged with its page</li>
-        <li>Every read connected in one brain</li>
-      </ul>
+      <p class="lede short">A web crawler that reads SEC filings page by page, feeding an Obsidian brain that connects everything it reads.</p>
     </section>
 
-    <section class="found" aria-labelledby="found-h">
-      <p class="eyebrow">Founding access · $50</p>
-      <h2 id="found-h">Get the blueprint.</h2>
-      <p class="lede">Everything you need to set up exactly what I set up: the files and the step-by-step guide. Use it for SEC filings like I do, or point it at anything you want.</p>
-      <ul class="gets">
-        <li><b>The crawler</b><span>And the live view you see in the videos.</span></li>
-        <li><b>The Obsidian brain</b><span>And the 3D map it powers.</span></li>
-        <li><b>The setup guide</b><span>Step by step, in the order I built it.</span></li>
-      </ul>
-    </section>
 
-    <section class="how" aria-labelledby="how-h">
-      <p class="eyebrow">How it works</p>
-      <h2 id="how-h">Watch it work.</h2>
+
+    <section class="how" aria-label="The crawler and the brain at work">
       <div class="step">
         <p class="stepno"><span>1</span>The crawler reads the filing</p>
         <div class="phone">
-          <video id="crawl" data-zoom src="assets/crawler-read.mp4?v=0ec54ab8" poster="assets/crawler-poster.jpg?v=7e10184f" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-label="The web crawler reading Anthropic's S-1 filing, 0 to 24 figures, then its one-screen report"></video>
-          <button type="button" class="play" aria-label="Play the crawler video">Tap to play</button>
+          <video id="crawl" data-zoom src="assets/crawler-read.mp4?v=863831ea" poster="assets/crawler-poster.jpg?v=7e10184f" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-label="The web crawler reading Anthropic's S-1 filing, 0 to 24 figures, then its one-screen report"></video>
         </div>
         <p class="phone-hint">Real read of Anthropic's S-1 · tap to expand</p>
       </div>
@@ -153,7 +142,6 @@
         <p class="stepno"><span>2</span>The brain connects it to everything else</p>
         <div class="screen">
           <video id="brain" data-zoom src="assets/brain-tour.mp4?v=6ab9d20a" poster="assets/brain-poster.jpg?v=20bfa9a6" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-label="The brain: a heat map turns into a 3D map of companies, then each filing the crawler read is threaded into its company"></video>
-          <button type="button" class="play" aria-label="Play the brain video">Tap to play</button>
         </div>
         <p class="phone-hint">Each read threads into its company · tap to expand</p>
       </div>
@@ -163,7 +151,7 @@
       <div id="formwrap">
         <div class="count"><i></i>Waitlist open</div>
         <h2>Get early access</h2>
-        <p class="sub">Join the free list, or get founding access for $50: the blueprint to set up exactly what I built.</p>
+        <p class="sub">Join free to follow along, or get founding access for $50 and build your own today.</p>
 
         <form id="wl" novalidate>
           <div class="field">
@@ -179,9 +167,18 @@
 
           <fieldset>
             <legend>Pick one</legend>
+            <table class="vs" aria-label="Free waitlist compared with founding access">
+              <thead><tr><th></th><th>Free</th><th class="pd">$50</th></tr></thead>
+              <tbody>
+                <tr><td>Updates and new crawler videos</td><td>✓</td><td class="pd">✓</td></tr>
+                <tr><td>The crawler and brain files, today</td><td>–</td><td class="pd">✓</td></tr>
+                <tr><td>Step-by-step guide to build your own</td><td>–</td><td class="pd">✓</td></tr>
+                <tr><td>Yours to keep and point at anything</td><td>–</td><td class="pd">✓</td></tr>
+              </tbody>
+            </table>
             <div class="opts">
-              <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Hear first when the crawler opens up, plus new videos</span></div></label>
-              <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Founding access <em class="tag paid">$50</em></b><span>The blueprint: the files for the crawler and the Obsidian brain, plus the step-by-step setup guide. One-time payment.</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Watch what I build: texts when the crawler opens up, plus new videos.</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Founding access <em class="tag paid">$50</em></b><span>Build it yourself, now: the files for the crawler and the Obsidian brain, plus the step-by-step setup guide. One-time payment, yours to keep.</span></div></label>
             </div>
             <p class="terms" id="terms">You get the blueprint by email <span id="ship-line"></span> after you pay. Payment is handled securely by Stripe; we never see your card.</p>
           </fieldset>
@@ -203,6 +200,17 @@
         <p>We'll text you when the crawler opens up.</p>
       </div>
     </section>
+
+    <section class="found" aria-labelledby="found-h">
+      <p class="eyebrow">Founding access · $50</p>
+      <h2 id="found-h">Get the blueprint.</h2>
+      <p class="lede">Everything you need to set up exactly what I set up: the files and the step-by-step guide. Use it for SEC filings like I do, or point it at anything you want.</p>
+      <ul class="gets">
+        <li><b>The crawler</b><span>And the live view you see in the videos.</span></li>
+        <li><b>The Obsidian brain</b><span>And the 3D map it powers.</span></li>
+        <li><b>The setup guide</b><span>Step by step, in the order I built it.</span></li>
+      </ul>
+    </section>
   </div>
 
   <footer>
@@ -211,6 +219,6 @@
   </footer>
 </div>
 
-<script src="app.js?v=8acb58a1"></script>
+<script src="app.js?v=d3b46f5a"></script>
 </body>
 </html>

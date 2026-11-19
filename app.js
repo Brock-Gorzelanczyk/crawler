@@ -84,27 +84,20 @@ form.addEventListener("submit", async e => {
 });
 function showDone(){ $("formwrap").style.display = "none"; $("done").classList.add("on"); }
 
-// Videos: play while on screen. Phones can block autoplay (iPhone Low Power Mode, data saver) or, in
-// some in-app browsers (TikTok, Instagram), leave play() hanging. So: if a video isn't actually moving
-// 2 s after we ask it to play, show "Tap to play"; and the first tap anywhere on the page starts them all.
+// Videos: play while on screen, muted and inline. A big file can take a few seconds to buffer on a
+// phone, so while a video is on screen and not moving we quietly ask again every 1.5 s. The first tap
+// anywhere on the page also starts them (allowed even where autoplay is blocked). No buttons.
 const vids = Array.from(document.querySelectorAll("video[data-zoom]"));
-const box = v => v.parentElement;
+const onScreen = new Set();
+const hasIO = "IntersectionObserver" in window;
+const visible = v => !hasIO || onScreen.has(v);
 function tryPlay(v) {
   v.muted = true;
-  try {
-    const p = v.play();
-    if (p && p.catch) p.catch(() => box(v).classList.add("blocked"));
-  } catch (e) { box(v).classList.add("blocked"); }
-  const t0 = v.currentTime;
-  setTimeout(() => { if (isOn(v) && (v.paused || v.currentTime === t0)) box(v).classList.add("blocked"); }, 2000);
+  try { const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
 }
-const onScreen = new Set();
-const isOn = v => onScreen.has(v) || !("IntersectionObserver" in window);
 vids.forEach(v => {
   v.muted = true; v.defaultMuted = true; v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
-  v.addEventListener("timeupdate", () => { if (v.currentTime > 0.05 && !v.paused) box(v).classList.remove("blocked"); });
-  const btn = box(v).querySelector(".play");
-  if (btn) btn.addEventListener("click", e => { e.stopPropagation(); box(v).classList.remove("blocked"); vids.forEach(tryPlay); });
+  ["loadedmetadata", "canplay", "canplaythrough"].forEach(ev => v.addEventListener(ev, () => { if (visible(v) && v.paused) tryPlay(v); }));
   v.addEventListener("click", () => {
     if (v.paused) { tryPlay(v); return; }
     try {
@@ -113,11 +106,11 @@ vids.forEach(v => {
     } catch (e) {}
   });
 });
-// first touch or click anywhere counts as permission to play: start the videos inside that tap
-const unlock = () => { vids.forEach(v => { if (isOn(v) || v.paused) tryPlay(v); }); };
+setInterval(() => vids.forEach(v => { if (visible(v) && v.paused) tryPlay(v); }), 1500);
+const unlock = () => vids.forEach(v => { if (visible(v)) tryPlay(v); });
 document.addEventListener("touchend", unlock, {once: true, passive: true});
 document.addEventListener("click", unlock, {once: true});
-if ("IntersectionObserver" in window) {
+if (hasIO) {
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting) { onScreen.add(e.target); tryPlay(e.target); } else { onScreen.delete(e.target); e.target.pause(); }
   }), {threshold: 0.25});
