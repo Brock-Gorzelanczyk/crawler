@@ -48,7 +48,7 @@ const info = (p, id) => p.evaluate(id => { const e = document.getElementById(id)
     const p2 = await page(b, {...android}, () => { HTMLMediaElement.prototype.play = function () { return Promise.reject(new DOMException('blocked', 'NotAllowedError')); };
       Object.defineProperty(HTMLMediaElement.prototype, 'autoplay', {get() { return false; }, set() {}});
       const sa = Element.prototype.setAttribute; Element.prototype.setAttribute = function (k, v) { if (this instanceof HTMLMediaElement && k === 'autoplay') return; return sa.call(this, k, v); }; });
-    await swapped(p2, 'crawl');   // 4 s on screen without playing, then the WebP downloads (about 10 MB)
+    await p2.locator('#crawl').scrollIntoViewIfNeeded(); await swapped(p2, 'crawl');   // the crawler clip is second on the page: scroll to it   // 4 s on screen without playing, then the WebP downloads (about 10 MB)
     let i = await info(p2, 'crawl'); ok(i.tag === 'IMG' && /\.webp/.test(i.src) && await moving(p2, 'crawl'), `Android, autoplay blocked: crawler falls back to WebP ${JSON.stringify(i)}`);
     await p2.locator('#brain').scrollIntoViewIfNeeded(); await swapped(p2, 'brain');
     i = await info(p2, 'brain'); ok(i.tag === 'IMG' && /\.webp/.test(i.src) && await moving(p2, 'brain'), `Android, autoplay blocked: brain falls back to WebP ${JSON.stringify(i)}`);
