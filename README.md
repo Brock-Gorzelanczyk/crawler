@@ -13,8 +13,10 @@ Every contact goes into a Google Sheet you own, so someone who opens checkout an
 | `app.js` | The form logic. Three settings at the top: `ENDPOINT`, `STRIPE_LINK`, `DELIVERY` |
 | `privacy.html` | Privacy notice the consent box links to. Contact: your Gmail |
 | `apps-script/Code.gs` | Saves sign-ups to the Waitlist tab (one row per person) and pulls Stripe-confirmed payments into the Paid tab |
-| `assets/` | The 7-second crawler loop (0.8 MB) and its poster frame |
-| `test/form_test.js` | End-to-end check (22 checks, phone and desktop) |
+| `assets/` | The two clips (`crawler-read`, `brain-tour`) as MP4, as animated WebP fallbacks, and their poster frames |
+| `stamp.py` | Sets each `?v=` in `index.html` to its file's hash. Run after changing any asset or `app.js` |
+| `test/clip_test.js` | The clips on phones: iPhone (WebKit) never gets a video player, Android falls back to WebP |
+| `test/form_test.js` | End-to-end form check (22 checks, phone and desktop) |
 
 ## Setup (about 15 minutes, once)
 
@@ -84,5 +86,7 @@ cd ~/crawler-waitlist && python3 -m http.server 8765 --bind 127.0.0.1
 ```
 
 ```bash
-cd ~/crawler-waitlist && node test/form_test.js
+cd ~/crawler-waitlist && node test/form_test.js && node test/clip_test.js
 ```
+
+Why the clips are images on iPhone: in-app browsers (TikTok, Instagram) on iPhone throw any playing video into the full-screen player, and closing it reopens it. An `<img>` whose source is the MP4 plays like a GIF in WebKit instead, with nothing to tap.

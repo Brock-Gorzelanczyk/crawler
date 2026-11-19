@@ -39,7 +39,7 @@
   .facts li::before{content:"";flex:none;width:8px;height:8px;margin-top:8px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink)}
   .phone{position:relative;width:min(340px,80vw);aspect-ratio:9/16;border-radius:28px;overflow:hidden;border:1px solid var(--line);
     box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 6px #0b0f15,0 0 60px rgba(111,244,255,.12);margin:6px auto 0;background:#000}
-  .phone video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  .phone .clip{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
   .found{margin-top:36px;border-top:1px solid var(--line);padding-top:32px}
   .how{margin-top:4px}
   .lede.short{margin-bottom:0}
@@ -51,7 +51,7 @@
   .stepno span{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--cyan);color:#001a22;font:700 14px 'IBM Plex Mono',monospace}
   .screen{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/9;
     box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(255,61,166,.10)}
-  .screen video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  .screen .clip{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
   .gets{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:10px;grid-template-columns:1fr}
   @media(min-width:640px){.gets{grid-template-columns:1fr 1fr 1fr}}
   .gets li{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px}
@@ -134,14 +134,14 @@
       <div class="step">
         <p class="stepno"><span>1</span>The crawler reads the whole thing, every number tagged to its page</p>
         <div class="phone">
-          <video id="crawl" data-zoom src="assets/crawler-read.mp4?v=863831ea" poster="assets/crawler-poster.jpg?v=7e10184f" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-label="The web crawler reading a document from the first page to the last, tagging each number with its page, then its one-screen report"></video>
+          <img class="clip" id="crawl" src="assets/crawler-poster.jpg?v=7e10184f" data-mp4="assets/crawler-read.mp4?v=863831ea" data-webp="assets/crawler-read.webp?v=b8d81288" alt="The web crawler reading a document from the first page to the last, tagging each number with its page, then its one-screen report">
         </div>
         <p class="phone-hint">Example read: Anthropic's S-1</p>
       </div>
       <div class="step">
         <p class="stepno"><span>2</span>Every read connects into the brain</p>
         <div class="screen">
-          <video id="brain" data-zoom src="assets/brain-tour.mp4?v=6ab9d20a" poster="assets/brain-poster.jpg?v=20bfa9a6" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-label="The brain: a heat map turns into a 3D map of companies, then each document the crawler read is threaded into everything it connects to"></video>
+          <img class="clip" id="brain" src="assets/brain-poster.jpg?v=07554fed" data-mp4="assets/brain-tour.mp4?v=b3a1a8ea" data-webp="assets/brain-tour.webp?v=f2d301b2" alt="The brain: a heat map flies into a 3D map of the whole market, every document the crawler read runs through the crawler into its company, then a tour of each read">
         </div>
         <p class="phone-hint">Each read threads into everything it touches</p>
       </div>
@@ -219,6 +219,6 @@
   </footer>
 </div>
 
-<script src="app.js?v=80b8d7db"></script>
+<script src="app.js?v=428b1a17"></script>
 </body>
 </html>

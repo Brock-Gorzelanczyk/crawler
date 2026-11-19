@@ -84,28 +84,60 @@ form.addEventListener("submit", async e => {
 });
 function showDone(){ $("formwrap").style.display = "none"; $("done").classList.add("on"); }
 
-// Videos: play while on screen, muted and inline. A big file can take a few seconds to buffer on a
-// phone, so while a video is on screen and not moving we quietly ask again every 1.5 s. The first tap
-// anywhere on the page also starts them (allowed even where autoplay is blocked). No buttons.
-const vids = Array.from(document.querySelectorAll("video[data-zoom]"));
-const onScreen = new Set();
+// The two clips. The page ships each one as its poster image; this swaps in the moving version.
+// iPhone and iPad: every browser there is WebKit, including the TikTok and Instagram in-app browsers, and those
+// in-app browsers throw any playing <video> into the full-screen player (closing it just reopens it). So on iOS
+// there is no <video> at all: the clip is an <img> whose source is the MP4, which WebKit plays like a GIF (muted,
+// looping, inline, nothing to tap). If that image fails, an animated WebP.
+// Everywhere else: a muted looping <video>. If it has not started after 4 s on screen (an in-app browser that
+// blocks autoplay), or anything takes it full screen, the animated WebP replaces it.
+const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const hasIO = "IntersectionObserver" in window;
-const visible = v => !hasIO || onScreen.has(v);
-function tryPlay(v) {
-  v.muted = true;
-  try { const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+const clips = Array.from(document.querySelectorAll("img[data-mp4]")).map(el => ({el, mp4: el.dataset.mp4, webp: el.dataset.webp, done: false}));
+
+function swapIn(c, node) { node.className = c.el.className; node.id = c.el.id; c.el.replaceWith(node); c.el = node; }
+function asImage(c, src, onfail) {                 // load off-page first, so the poster stays up until it is ready
+  const i = new Image(); i.alt = c.el.getAttribute("alt") || c.el.getAttribute("aria-label") || ""; i.decoding = "async";
+  i.onload = () => { if (i.naturalWidth) swapIn(c, i); else if (onfail) onfail(); };
+  i.onerror = () => { if (onfail) onfail(); };
+  i.src = src;
 }
-vids.forEach(v => {
-  v.muted = true; v.defaultMuted = true; v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
-  ["loadedmetadata", "canplay", "canplaythrough"].forEach(ev => v.addEventListener(ev, () => { if (visible(v) && v.paused) tryPlay(v); }));
+const toWebp = c => { if (c.done) return; c.done = true; asImage(c, c.webp); };
+
+function asVideo(c) {
+  const v = document.createElement("video");
+  v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true; v.autoplay = true;
+  ["muted", "playsinline", "webkit-playsinline", "loop", "autoplay"].forEach(k => v.setAttribute(k, ""));
+  v.preload = "auto"; v.poster = c.el.getAttribute("src"); v.setAttribute("aria-label", c.el.getAttribute("alt") || "");
+  v.src = c.mp4; swapIn(c, v);
+  let seen = 0, last = Date.now();
+  const tryPlay = () => { v.muted = true; try { const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {} };
+  const visible = () => !hasIO || c.on;
+  const bail = () => { try { if (document.fullscreenElement === v) document.exitFullscreen(); if (v.webkitDisplayingFullscreen) v.webkitExitFullscreen(); } catch (e) {}
+    v.pause(); toWebp(c); };
+  v.addEventListener("webkitbeginfullscreen", bail);
+  document.addEventListener("fullscreenchange", () => { if (document.fullscreenElement === v) bail(); });
+  ["loadedmetadata", "canplay"].forEach(ev => v.addEventListener(ev, () => { if (visible() && v.paused) tryPlay(); }));
+  const tick = setInterval(() => {
+    if (c.el !== v) return clearInterval(tick);
+    const now = Date.now(); if (visible()) seen += now - last; last = now;
+    if (!visible()) { if (!v.paused) v.pause(); return; }
+    if (v.paused) tryPlay();
+    if (seen > 4000 && (v.paused || v.currentTime < 0.2)) { clearInterval(tick); toWebp(c); }
+  }, 500);
+  const unlock = () => { if (visible() && v.paused) tryPlay(); };
+  document.addEventListener("touchend", unlock, {once: true, passive: true});
+  document.addEventListener("click", unlock, {once: true});
+  return v;
+}
+
+clips.forEach(c => {
+  if (IOS) asImage(c, c.mp4, () => toWebp(c));
+  else asVideo(c);
 });
-setInterval(() => vids.forEach(v => { if (visible(v) && v.paused) tryPlay(v); }), 1500);
-const unlock = () => vids.forEach(v => { if (visible(v)) tryPlay(v); });
-document.addEventListener("touchend", unlock, {once: true, passive: true});
-document.addEventListener("click", unlock, {once: true});
 if (hasIO) {
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    if (e.isIntersecting) { onScreen.add(e.target); tryPlay(e.target); } else { onScreen.delete(e.target); e.target.pause(); }
-  }), {threshold: 0.25});
-  vids.forEach(v => io.observe(v));
-} else vids.forEach(tryPlay);
+  // watch the frames, which stay put while the clip inside them is swapped
+  const frames = new Map(clips.map(c => [c.el.parentNode, c]));
+  const io = new IntersectionObserver(es => es.forEach(e => { const c = frames.get(e.target); if (c) c.on = e.isIntersecting; }), {threshold: 0.25});
+  frames.forEach((c, f) => io.observe(f));
+}
