@@ -83,3 +83,12 @@ form.addEventListener("submit", async e => {
   }
 });
 function showDone(){ $("formwrap").style.display = "none"; $("done").classList.add("on"); }
+
+// tap the crawler video to watch it full screen (iPhone Safari uses its own video player call)
+const crawl = document.getElementById("crawl");
+if (crawl) crawl.addEventListener("click", () => {
+  try {
+    if (crawl.requestFullscreen) crawl.requestFullscreen().catch(() => {});
+    else if (crawl.webkitEnterFullscreen) crawl.webkitEnterFullscreen();
+  } catch (e) {}
+});
