@@ -26,10 +26,64 @@
   .wrap{max-width:1040px;margin:0 auto;padding:20px 16px 40px}
   header{display:flex;align-items:center;gap:10px;margin-bottom:28px}
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.01em;text-decoration:none;color:var(--text)}
-  .grid{display:grid;grid-template-columns:1fr;gap:28px;align-items:start}
-  .grid{grid-template-areas:"intro" "how" "card" "found"}
-  .intro{grid-area:intro}.card{grid-area:card}.found{grid-area:found}.how{grid-area:how}
-  @media(min-width:860px){.grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);grid-template-areas:"intro card" "how card" "found card";gap:0 44px}}
+  header{justify-content:space-between;position:sticky;top:0;z-index:40;margin:-20px -16px 22px;padding:14px 16px;background:rgba(5,7,12,.86);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
+  header.stuck{border-bottom-color:var(--line)}
+  .nav{display:flex;align-items:center;gap:6px}
+  .nav a{color:var(--muted);text-decoration:none;font:600 14px Inter,sans-serif;padding:8px 10px;border-radius:10px}
+  .nav a:hover{color:var(--text);background:var(--panel)}
+  .nav a.get{color:#00202a;background:var(--cyan);padding:8px 14px}
+  @media(max-width:520px){.nav a.opt-nav{display:none}}
+  .sec{margin-top:56px}
+  .sec-h{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.025em;line-height:1.08;margin:0 0 8px}
+  .sec-sub{color:var(--muted);margin:0 0 22px;font-size:16px}
+  .intro{max-width:760px}
+  .sneak{color:var(--cyan);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px;text-decoration-color:rgba(111,244,255,.55)}
+  .sneak:hover{text-decoration-color:var(--cyan)}
+  .proof{list-style:none;padding:0;margin:22px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+  .proof li{font:600 12.5px 'IBM Plex Mono',monospace;color:#c9d1dc;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+  .proof b{color:var(--cyan);font-weight:600}
+  .plans{display:grid;gap:14px;grid-template-columns:1fr}
+  @media(min-width:860px){.plans{grid-template-columns:repeat(3,1fr);align-items:stretch}}
+  .plan{position:relative;display:flex;text-decoration:none;color:var(--text);flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 20px 20px;cursor:pointer;
+    transition:border-color .15s,transform .15s,box-shadow .15s}
+  .plan:hover{transform:translateY(-2px)}
+  .plan.free:hover{border-color:var(--green)}
+  .plan.kit{border-color:rgba(255,61,166,.55);box-shadow:0 0 0 1px rgba(255,61,166,.25),0 20px 60px rgba(255,61,166,.12)}
+  .plan.kit:hover{border-color:var(--pink)}
+  .plan.inv:hover{border-color:var(--gold)}
+  .plan .badge{position:absolute;top:-11px;left:20px;font:700 11px 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+  .plan.kit .badge{background:var(--pink);color:#fff}
+  .plan.inv .badge{background:var(--gold);color:#1a1200}
+  .pname{font-weight:800;font-size:19px;margin:0}
+  .price{font-weight:900;font-size:40px;letter-spacing:-.03em;line-height:1;margin:12px 0 4px}
+  .price i{font:500 14px Inter,sans-serif;font-style:normal;color:var(--muted);letter-spacing:0;margin-left:6px}
+  .plan.free .price{color:var(--green)} .plan.kit .price{color:var(--pink)} .plan.inv .price{color:var(--gold)}
+  .pline{color:#c9d1dc;font-size:14.5px;margin:6px 0 16px;min-height:2.9em}
+  .plan .whys{margin-bottom:20px;flex:1;align-content:start}
+  .plan.free .whys li::before{color:var(--green)}
+  .plan.inv .whys li::before{color:var(--gold)}
+  .pbtn{display:flex;align-items:center;justify-content:center;height:50px;border-radius:12px;font:800 16px Inter,sans-serif;text-decoration:none}
+  .plan.free .pbtn{background:transparent;color:var(--green);border:1.5px solid rgba(47,220,116,.6)}
+  .plan.kit .pbtn{background:var(--pink);color:#fff;box-shadow:0 10px 30px rgba(255,61,166,.3)}
+  .plan.inv .pbtn{background:var(--gold);color:#1a1200;box-shadow:0 10px 30px rgba(255,194,77,.25)}
+  @media(max-width:859px){
+    .plan.kit{order:1}.plan.inv{order:2}.plan.free{order:3}
+    .plan{padding:20px 18px 18px}.plan .badge{left:18px}
+    .pline{min-height:0;margin-bottom:12px}
+    .plan.free{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 14px;padding:16px 18px}
+    .plan.free .price{font-size:26px;margin:0;grid-row:2}
+    .plan.free .pname{grid-column:1}
+    .plan.free .pline,.plan.free .whys{display:none}
+    .plan.free .pbtn{grid-column:2;grid-row:1/3;height:44px;padding:0 18px}
+  }
+  .plans-fine{color:var(--muted);font-size:13.5px;text-align:center;margin:16px 0 0}
+  .how .step{max-width:760px;margin-left:auto;margin-right:auto}
+  .card{max-width:600px;margin:56px auto 0;scroll-margin-top:84px}
+  @media(min-width:860px){.card{position:static}}
+  .opt.flash{animation:flash .9s ease}
+  @keyframes flash{0%{box-shadow:0 0 0 0 rgba(111,244,255,.7)}100%{box-shadow:0 0 0 14px rgba(111,244,255,0)}}
+  #plans,#how{scroll-margin-top:76px}
   .eyebrow{font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin:0 0 14px}
   h1{font-weight:900;font-size:clamp(38px,8.5vw,64px);line-height:1;letter-spacing:-.035em;margin:0 0 16px}
   h1 em{font-style:normal;color:var(--cyan)}
@@ -134,77 +188,119 @@
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <header id="top">
     <a class="brand" href="./" aria-label="BMG Capital">
       <svg width="30" height="22" viewBox="0 0 30 22" aria-hidden="true"><path d="M2 19 L11 10.5 L16.5 15 L26 5" fill="none" stroke="#6ff4ff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="5" r="3.8" fill="#6ff4ff"/></svg>
       BMG Capital
     </a>
+    <nav class="nav" aria-label="On this page">
+      <a class="opt-nav" href="#how">See it work</a>
+      <a href="#plans">Plans</a>
+      <a class="get" href="#join" data-plan="founding">Get it</a>
+    </nav>
   </header>
 
-  <div class="grid">
-    <section class="intro">
-      <p class="eyebrow">As seen on TikTok</p>
-      <h1>The <em>crawler</em> reads it. The <em>brain</em> remembers it.</h1>
-      <p class="lede short">A web crawler that reads any document cover to cover, tags every number with the page it came from, and feeds each read into an Obsidian brain that connects it to everything else.</p>
-    </section>
+  <section class="intro">
+    <p class="eyebrow">As seen on TikTok</p>
+    <h1>The <em>crawler</em> reads it. The <em>brain</em> remembers it.</h1>
+    <p class="lede short">A web crawler that reads any document <a class="sneak" href="#join" data-plan="founding">cover to cover</a>, tags every number with the page it came from, and feeds each read into an Obsidian brain that <a class="sneak" href="#join" data-plan="investor">connects it to everything else</a>.</p>
+    <ul class="proof" aria-label="At a glance">
+      <li><b>400+</b> S&amp;P 500 10-Ks read</li>
+      <li>Every number → its page</li>
+      <li>Runs on your computer</li>
+      <li>No subscription</li>
+    </ul>
+  </section>
 
+  <section class="sec" id="plans" aria-labelledby="plans-h">
+    <h2 class="sec-h" id="plans-h">Pick your plan.</h2>
+    <p class="sec-sub">One payment, yours to keep. Tap a plan and finish in under a minute.</p>
+    <div class="plans">
+      <a class="plan free" href="#join" data-plan="waitlist">
+        <p class="pname">Waitlist</p>
+        <p class="price">Free</p>
+        <p class="pline">Follow along and hear first when the crawler opens up.</p>
+        <ul class="whys">
+          <li><b>Texts when it opens up</b></li>
+          <li><b>New crawler videos</b> first</li>
+          <li>You wait for launch, at launch price</li>
+        </ul>
+        <span class="pbtn">Join free</span>
+      </a>
+      <a class="plan kit" href="#join" data-plan="founding">
+        <span class="badge">Founding price</span>
+        <p class="pname">Crawler Kit</p>
+        <p class="price">$50<i>one time</i></p>
+        <p class="pline">The whole system, built and ready to run. Start reading today.</p>
+        <ul class="whys">
+          <li><b>The crawler, the brain and the 3D map</b></li>
+          <li><b>Record mode:</b> make crawler videos like mine</li>
+          <li><b>Step-by-step install guide</b> and email help from me</li>
+          <li><b>Every future update,</b> free</li>
+          <li>Price goes up at launch</li>
+        </ul>
+        <span class="pbtn">Get the Crawler Kit · $50</span>
+      </a>
+      <a class="plan inv" href="#join" data-plan="investor">
+        <span class="badge">Brain included</span>
+        <p class="pname">Investor Edition</p>
+        <p class="price">$249<i>one time</i></p>
+        <p class="pline">Everything in the Kit, with the brain already filled. Skip the reading.</p>
+        <ul class="whys">
+          <li><b>Everything in the Crawler Kit</b></li>
+          <li><b>400+ S&amp;P 500 companies</b> read from their 10-Ks</li>
+          <li><b>Comp sets, KPIs, industry and sector pages,</b> every number tagged to its filing page</li>
+          <li><b>12 months of data updates,</b> then $99/yr if you want them</li>
+        </ul>
+        <span class="pbtn">Get the Investor Edition · $249</span>
+      </a>
+    </div>
+    <p class="plans-fine">Paid plans check out securely with Stripe. Files arrive by email within minutes.</p>
+  </section>
 
-
-    <section class="how" aria-label="The crawler and the brain at work">
-      <div class="step">
-        <p class="stepno"><span>1</span>The crawler reads it, the brain connects it</p>
-        <div class="screen">
-          <img class="clip" id="brain" src="assets/brain-poster.jpg?v=edc1e99f" data-mp4="assets/brain-tour.mp4?v=a8d33c94" data-webp="assets/brain-tour.webp?v=d64d26a4" data-poster-tall="assets/brain-poster-tall.jpg?v=680cd431" data-mp4-tall="assets/brain-tour-tall.mp4?v=70809c36" data-webp-tall="assets/brain-tour-tall.webp?v=83069bb5" alt="The tour: the whole market in the brain, one read rides through the crawler into its company, the crawler reads the filing, the report it made with every number tied to its page, then the brain folds back into the heat map">
-        </div>
-        <p class="phone-hint">One read, from the market to its report and back</p>
+  <section class="sec how" id="how" aria-labelledby="how-h">
+    <h2 class="sec-h" id="how-h" style="text-align:center">See it work.</h2>
+    <p class="sec-sub" style="text-align:center">Real reads, recorded straight from the crawler.</p>
+    <div class="step">
+      <p class="stepno"><span>1</span>The crawler reads it, the brain connects it</p>
+      <div class="screen">
+        <img class="clip" id="brain" src="assets/brain-poster.jpg?v=edc1e99f" data-mp4="assets/brain-tour.mp4?v=a8d33c94" data-webp="assets/brain-tour.webp?v=d64d26a4" data-poster-tall="assets/brain-poster-tall.jpg?v=680cd431" data-mp4-tall="assets/brain-tour-tall.mp4?v=70809c36" data-webp-tall="assets/brain-tour-tall.webp?v=83069bb5" alt="The tour: the whole market in the brain, one read rides through the crawler into its company, the crawler reads the filing, the report it made with every number tied to its page, then the brain folds back into the heat map">
       </div>
-      <div class="step">
-        <p class="stepno"><span>2</span>Up close: every number tagged to its page</p>
-        <div class="phone">
-          <img class="clip" id="crawl" src="assets/crawler-poster.jpg?v=7e10184f" data-mp4="assets/crawler-read.mp4?v=863831ea" data-webp="assets/crawler-read.webp?v=b8d81288" alt="The web crawler reading a document from the first page to the last, tagging each number with its page, then its one-screen report">
-        </div>
-        <p class="phone-hint">Example read: Anthropic's S-1</p>
+      <p class="phone-hint">One read, from the market to its report and back</p>
+    </div>
+    <div class="step">
+      <p class="stepno"><span>2</span>Up close: every number tagged to its page</p>
+      <div class="phone">
+        <img class="clip" id="crawl" src="assets/crawler-poster.jpg?v=7e10184f" data-mp4="assets/crawler-read.mp4?v=863831ea" data-webp="assets/crawler-read.webp?v=b8d81288" alt="The web crawler reading a document from the first page to the last, tagging each number with its page, then its one-screen report">
       </div>
-    </section>
+      <p class="phone-hint">Example read: Anthropic's S-1 · <a class="sneak" href="#join" data-plan="founding">read your own</a></p>
+    </div>
+  </section>
 
-    <section class="card" id="join">
+  <section class="card" id="join">
       <div id="formwrap">
         <div class="count"><i></i>Waitlist open</div>
-        <h2>Get early access</h2>
-        <p class="sub">Join free to follow along, get the Crawler Kit for $50 and start reading today, or get the Investor Edition for $249 with the brain already filled.</p>
+        <h2>Last step</h2>
+        <p class="sub">Your email and number. Your phone can fill both in one tap.</p>
 
         <form id="wl" novalidate>
-          <div class="field">
-            <label for="phone">Phone number</label>
-            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 123-4567" required>
-            <div class="hint" id="phone-hint" aria-live="polite"></div>
-          </div>
           <div class="field">
             <label for="email">Email</label>
             <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
             <div class="hint" id="email-hint" aria-live="polite"></div>
           </div>
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 123-4567" required>
+            <div class="hint" id="phone-hint" aria-live="polite"></div>
+          </div>
 
           <fieldset>
-            <legend>Pick one</legend>
-            <table class="vs" aria-label="Free waitlist compared with the Crawler Kit and the Investor Edition">
-              <thead><tr><th></th><th>Free</th><th class="pd">$50</th><th class="iv">$249</th></tr></thead>
-              <tbody>
-                <tr><td>Updates and new crawler videos</td><td>✓</td><td class="pd">✓</td><td class="iv">✓</td></tr>
-                <tr><td>The crawler, the brain and the 3D map, today</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
-                <tr><td>Record mode: make crawler videos like mine</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
-                <tr><td>Step-by-step setup guide, plus email help</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
-                <tr><td>Every future update to the files</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
-                <tr><td>Runs on your computer: no subscription, no AI fees</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
-                <tr><td>The brain already filled: 400+ S&amp;P 500 companies read from their 10-Ks</td><td>–</td><td>–</td><td class="iv">✓</td></tr>
-                <tr><td>Comp sets, KPIs, industry and sector pages, every number tagged to its filing page</td><td>–</td><td>–</td><td class="iv">✓</td></tr>
-                <tr><td>12 months of data updates as new filings come out</td><td>–</td><td>–</td><td class="iv">✓</td></tr>
-              </tbody>
-            </table>
+            <legend>Your plan</legend>
             <div class="opts">
-              <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Follow along: texts when the crawler opens up, plus new videos. You wait for launch, at launch price.</span></div></label>
-              <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Crawler Kit <em class="tag paid">$50</em></b><span>The whole system, built and ready to run: the crawler, the Obsidian brain and Record mode, with a step-by-step install guide. Start reading today, get every update free and email help from me. One payment, yours to keep.</span></div></label>
-              <label class="opt"><input type="radio" name="tier" value="investor"><div><b>Investor Edition <em class="tag inv">$249</em></b><span>Everything in the Crawler Kit, plus the brain already filled: 400+ S&amp;P 500 companies read from their 10-Ks, with comp sets, KPIs, industry and sector pages, every number tagged to its filing page. 12 months of data updates included; after that, $99 a year if you want them. Yours to keep either way.</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Texts when it opens up, plus new videos.</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Crawler Kit <em class="tag paid">$50</em></b><span>The whole system, ready to run today. Every update free.</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="investor"><div><b>Investor Edition <em class="tag inv">$249</em></b><span>The Kit plus the brain already filled: 400+ S&amp;P 500 companies.</span></div></label>
             </div>
             <p class="terms" id="terms">You get <span id="ship-what">the files and the install guide</span> by email <span id="ship-line"></span> after you pay. Payment is handled securely by Stripe; we never see your card. No GitHub account needed.</p>
           </fieldset>
@@ -227,36 +323,6 @@
       </div>
     </section>
 
-    <section class="found" aria-labelledby="found-h">
-      <p class="eyebrow">Crawler Kit · $50</p>
-      <h2 id="found-h">Get the whole system.</h2>
-      <p class="lede">The same crawler, brain and Record mode I use in every video, already built. Install it with the guide and start reading today: filings, reports, research, contracts, anything.</p>
-      <ul class="gets">
-        <li><b>The crawler</b><span>And the live view you see in the videos.</span></li>
-        <li><b>The Obsidian brain</b><span>And the 3D map it powers.</span></li>
-        <li><b>Record mode</b><span>Turn any read into a video like mine.</span></li>
-        <li><b>The install guide</b><span>Step by step, from download to your first read.</span></li>
-        <li><b>Email help</b><span>Stuck on setup? Email me.</span></li>
-        <li><b>Every update</b><span>New versions of the files, free.</span></li>
-      </ul>
-      <h3 class="why">Why get it now instead of waiting</h3>
-      <ul class="whys">
-        <li><b>Start today.</b> The waitlist waits for launch. Kit owners are reading now.</li>
-        <li><b>Lock in $50.</b> It's the founding price; it goes up at launch.</li>
-        <li><b>Every update, free.</b> Each new version I build lands in your inbox.</li>
-        <li><b>Help from me.</b> Stuck on install? Email me directly.</li>
-      </ul>
-      <p class="fine">Runs on any computer. No subscription, no AI fees.</p>
-      <h3 class="why inv-h">Investor Edition · $249: skip the reading</h3>
-      <ul class="whys">
-        <li><b>The brain, already filled.</b> 400+ S&amp;P 500 companies read from their 10-Ks, ready the day you install.</li>
-        <li><b>Comps and KPIs built in.</b> Industry and sector pages, comp sets and KPIs, every number tagged to its filing page.</li>
-        <li><b>A year of data updates.</b> New filings read and sent to you for 12 months; after that, $99 a year if you want them.</li>
-        <li><b>Everything in the Crawler Kit.</b> The crawler, Record mode, the install guide and email help.</li>
-      </ul>
-    </section>
-  </div>
-
   <footer>
     <span>© <span id="yr"></span> BMG Capital · Not investment advice.</span>
     <a href="privacy.html">Privacy</a>
@@ -265,6 +331,6 @@
 
 <a class="cta" id="cta" href="#join">Get the crawler <span aria-hidden="true">↓</span></a>
 
-<script src="app.js?v=c5cbf5dd"></script>
+<script src="app.js?v=e93867b2"></script>
 </body>
 </html>
