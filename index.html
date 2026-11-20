@@ -51,6 +51,7 @@
   .stepno span{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--cyan);color:#001a22;font:700 14px 'IBM Plex Mono',monospace}
   .screen{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/9;
     box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(255,61,166,.10)}
+  @media(max-width:760px){.screen{aspect-ratio:9/16;width:min(360px,86vw);margin:0 auto;border-radius:28px}}   /* phones get the tall tour (app.js) */
   .screen .clip{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
   .gets{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:10px;grid-template-columns:1fr}
   @media(min-width:640px){.gets{grid-template-columns:1fr 1fr 1fr}}
@@ -134,7 +135,7 @@
       <div class="step">
         <p class="stepno"><span>1</span>The crawler reads it, the brain connects it</p>
         <div class="screen">
-          <img class="clip" id="brain" src="assets/brain-poster.jpg?v=59697d05" data-mp4="assets/brain-tour.mp4?v=b8a4b715" data-webp="assets/brain-tour.webp?v=b7e0240d" alt="The tour: the whole market in the brain, one read rides through the crawler into its company, the crawler reads the filing, the report it made with every number tied to its page, then the brain folds back into the heat map">
+          <img class="clip" id="brain" src="assets/brain-poster.jpg?v=edc1e99f" data-mp4="assets/brain-tour.mp4?v=a8d33c94" data-webp="assets/brain-tour.webp?v=d64d26a4" data-poster-tall="assets/brain-poster-tall.jpg?v=680cd431" data-mp4-tall="assets/brain-tour-tall.mp4?v=70809c36" data-webp-tall="assets/brain-tour-tall.webp?v=83069bb5" alt="The tour: the whole market in the brain, one read rides through the crawler into its company, the crawler reads the filing, the report it made with every number tied to its page, then the brain folds back into the heat map">
         </div>
         <p class="phone-hint">One read, from the market to its report and back</p>
       </div>
@@ -219,6 +220,6 @@
   </footer>
 </div>
 
-<script src="app.js?v=428b1a17"></script>
+<script src="app.js?v=e9da22c4"></script>
 </body>
 </html>

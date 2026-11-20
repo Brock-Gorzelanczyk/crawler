@@ -2,6 +2,9 @@
  * Web crawler sign-ups -> this Google Sheet, in two tabs:
  *   Waitlist : everyone who signs up on the page (free list). Someone who clicked the $100 option shows
  *              "started $100 checkout" in the tier column until Stripe confirms they paid.
+ *   Visits   : how many people the page reached, one row per day and source (?src=): visits, saw the tour clip,
+ *              saw the crawler clip, reached the form, joined free, started checkout. Counts only: no phone, email,
+ *              IP, cookie or device id is ever sent or kept.
  *   Paid     : only payments Stripe confirms, pulled from Stripe every 10 minutes (syncPaid). The page never
  *              writes here, so nobody can add themselves to Paid without paying.
  *
@@ -11,6 +14,8 @@
  */
 var WAIT = 'Waitlist', PAID = 'Paid';
 var WAIT_HEAD = ['first_seen', 'last_seen', 'phone', 'email', 'tier', 'source', 'sms_email_consent', 'consent_text', 'page', 'timezone', 'times_submitted'];
+var VISITS = 'Visits', VIS_HEAD = ['day', 'source', 'visits', 'saw_tour', 'saw_crawler', 'reached_form', 'joined_free', 'started_checkout'];
+var EVENTS = {visit: 2, tour: 3, crawl: 4, form: 5, join: 6, checkout: 7};   // event -> column (0-based) in Visits
 var PAID_HEAD = ['paid_at', 'name', 'email', 'phone', 'amount', 'currency', 'stripe_session', 'payment_link', 'delivered'];
 
 // Spam limits: the web app URL is public, so anyone can post to it. One save per phone or email per minute,
@@ -38,9 +43,31 @@ function throttled_(phone, email) {
   return false;
 }
 
+// ---- a page event: one count added to today's row for its source ----
+function countEvent_(p) {
+  var col = EVENTS[p.ev]; if (!col) return out_({ok: false});
+  var c = CacheService.getScriptCache(), hk = 'v:' + Math.floor(Date.now() / 3600000), n = +(c.get(hk) || 0);
+  if (n >= 20000) return out_({ok: true});                       // an hourly cap: the URL is public
+  c.put(hk, String(n + 1), 3700);
+  var src = clean_(p.source, 40).toLowerCase().replace(/[^a-z0-9._-]/g, '') || 'direct';
+  var day = Utilities.formatDate(new Date(), 'America/New_York', 'yyyy-MM-dd');
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) return out_({ok: false});
+  try {
+    var sh = tab_(VISITS, VIS_HEAD), last = sh.getLastRow();
+    var from = Math.max(2, last - 400), rows = last >= 2 ? sh.getRange(from, 1, last - from + 1, 2).getDisplayValues() : [];
+    var at = -1;
+    for (var i = rows.length - 1; i >= 0; i--) { if (rows[i][0] === day && rows[i][1] === src) { at = from + i; break; } }
+    if (at < 0) { if (last > MAX_ROWS) return out_({ok: false}); sh.appendRow([day, safe_(src), 0, 0, 0, 0, 0, 0]); at = sh.getLastRow(); sh.getRange(at, 1).setNumberFormat('@').setValue(day); }
+    var cell = sh.getRange(at, col + 1); cell.setValue((+cell.getValue() || 0) + 1);
+    return out_({ok: true});
+  } finally { lock.releaseLock(); }
+}
+
 // ---- the page posts here ----
 function doPost(e) {
   var p = (e && e.parameter) || {};
+  if (p.ev) return countEvent_(p);
   if (p.company) return out_({ok: true});                       // hidden bot field filled: drop it quietly
   var phone = clean_(p.phone, 20), email = clean_(p.email, 254).toLowerCase();
   if (!/^\+\d{8,15}$/.test(phone) || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || p.consent !== 'yes') return out_({ok: false});

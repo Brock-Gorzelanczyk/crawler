@@ -14,6 +14,26 @@ const CONSENT_TEXT = "I agree to get texts and emails from BMG Capital about the
 document.getElementById("yr").textContent = new Date().getFullYear();
 const $ = id => document.getElementById(id);
 const form = $("wl");
+
+// ---- counts, not tracking: how many people the page reached and how far they got (the Sheet's Visits tab).
+// Each event sends only its name and the ?src= tag. No phone, email, cookie, IP or device id; each counts once per page load.
+const SRC = (new URLSearchParams(location.search).get("src") || (document.referrer ? (() => { try { return new URL(document.referrer).hostname; } catch (e) { return "direct"; } })() : "direct")).slice(0, 40);
+const sentEv = {};
+function ev(name){
+  if (!ENDPOINT || sentEv[name]) return; sentEv[name] = 1;
+  const body = new URLSearchParams({ev: name, source: SRC});
+  try { if (navigator.sendBeacon && navigator.sendBeacon(ENDPOINT, body)) return; } catch (e) {}
+  fetch(ENDPOINT, {method: "POST", mode: "no-cors", keepalive: true, headers: {"Content-Type": "application/x-www-form-urlencoded"}, body}).catch(() => {});
+}
+ev("visit");
+if ("IntersectionObserver" in window) {
+  const seen = new Map(), io = new IntersectionObserver(es => es.forEach(x => {
+    const name = x.target.dataset.ev;
+    if (x.isIntersecting) seen.set(name, setTimeout(() => { ev(name); io.unobserve(x.target); }, name === "form" ? 600 : 3000));   // a clip counts as seen after 3 s on screen
+    else clearTimeout(seen.get(name));
+  }), {threshold: 0.5});
+  [["brain", "tour"], ["crawl", "crawl"], ["join", "form"]].forEach(([id, name]) => { const el = $(id); if (el) { el.dataset.ev = name; io.observe(el); } });
+}
 $("ship-line").textContent = DELIVERY;
 
 // the button and the pre-order terms follow the choice
@@ -71,6 +91,7 @@ form.addEventListener("submit", async e => {
     // the contact is saved first, so someone who leaves checkout is still on the list.
     // Apps Script answers with a redirect that browsers block for reading; no-cors still delivers the row
     await fetch(ENDPOINT, {method: "POST", mode: "no-cors", headers: {"Content-Type": "application/x-www-form-urlencoded"}, body});
+    ev(paid ? "checkout" : "join");
     if (paid) {
       // no email or phone in the address: Stripe asks for both itself, and the Sheet's Paid tab matches buyers by email
       location.href = STRIPE_LINK;
@@ -93,6 +114,9 @@ function showDone(){ $("formwrap").style.display = "none"; $("done").classList.a
 // blocks autoplay), or anything takes it full screen, the animated WebP replaces it.
 const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const hasIO = "IntersectionObserver" in window;
+// phones (the same width as the CSS rule that makes the tour's frame 9:16) play the tall 9:16 tour; wider screens the 16:9 one
+if (matchMedia("(max-width: 760px)").matches) document.querySelectorAll("img[data-mp4-tall]").forEach(el => {
+  el.dataset.mp4 = el.dataset.mp4Tall; el.dataset.webp = el.dataset.webpTall; if (el.dataset.posterTall) el.src = el.dataset.posterTall; });
 const clips = Array.from(document.querySelectorAll("img[data-mp4]")).map(el => ({el, mp4: el.dataset.mp4, webp: el.dataset.webp, done: false}));
 
 function swapIn(c, node) { node.className = c.el.className; node.id = c.el.id; c.el.replaceWith(node); c.el = node; }
