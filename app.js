@@ -15,7 +15,7 @@ const PAID = {
   investor: {link: INVESTOR_LINK, price: "$249", sheet: "investor_checkout_started", what: "the files, the filled brain and the install guide", cls: "inv"}
 };
 // How soon a buyer gets the generic crawler after paying. Shown on the page.
-const DELIVERY = "within 24 hours";
+const DELIVERY = "within minutes";
 const CONSENT_TEXT = "I agree to get texts and emails from BMG Capital about the web crawler at the number and address above, including by automated means. Up to 4 msgs/month. Consent is not a condition of purchase. Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
 
 document.getElementById("yr").textContent = new Date().getFullYear();
