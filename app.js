@@ -18,6 +18,8 @@ const PAID = {
 const DELIVERY = "within minutes";
 const CONSENT_TEXT = "I agree to get texts and emails from BMG Capital about the web crawler at the number and address above, including by automated means. Up to 4 msgs/month. Consent is not a condition of purchase. Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
 
+// ?preview=1: a look-only copy that never writes to the Sheet or opens Stripe
+const LOCAL = new URLSearchParams(location.search).get("preview") === "1";
 document.getElementById("yr").textContent = new Date().getFullYear();
 const $ = id => document.getElementById(id);
 const form = $("wl");
@@ -27,7 +29,7 @@ const form = $("wl");
 const SRC = (new URLSearchParams(location.search).get("src") || (document.referrer ? (() => { try { return new URL(document.referrer).hostname; } catch (e) { return "direct"; } })() : "direct")).slice(0, 40);
 const sentEv = {};
 function ev(name){
-  if (!ENDPOINT || sentEv[name]) return; sentEv[name] = 1;
+  if (!ENDPOINT || LOCAL || sentEv[name]) return; sentEv[name] = 1;
   const body = new URLSearchParams({ev: name, source: SRC});
   try { if (navigator.sendBeacon && navigator.sendBeacon(ENDPOINT, body)) return; } catch (e) {}
   fetch(ENDPOINT, {method: "POST", mode: "no-cors", keepalive: true, headers: {"Content-Type": "application/x-www-form-urlencoded"}, body}).catch(() => {});
@@ -66,6 +68,21 @@ function drawTier(){
 form.addEventListener("change", e => { if (e.target.name === "tier") drawTier(); });
 drawTier();
 
+// every plan card, the nav's "Get it" and the underlined words in the text: pick that plan and glide down to the form
+function pickPlan(plan){
+  const r = form.querySelector(`input[name=tier][value="${plan}"]`); if (!r) return;
+  r.checked = true; drawTier();
+  $("join").scrollIntoView({behavior: "smooth", block: "start"});
+  const opt = r.closest(".opt"); opt.classList.remove("flash"); void opt.offsetWidth; opt.classList.add("flash");
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-plan]"); if (!a) return;
+  e.preventDefault(); pickPlan(a.dataset.plan);
+});
+// the header gets a hairline once the page scrolls under it
+(() => { const h = document.querySelector("header"); if (!h) return;
+  const draw = () => h.classList.toggle("stuck", scrollY > 8); addEventListener("scroll", draw, {passive: true}); draw(); })();
+
 // US numbers: (555) 123-4567 as you type; stored as +15551234567
 function digits(s){ return (s || "").replace(/\D/g, ""); }
 function e164(raw){
@@ -95,6 +112,7 @@ form.addEventListener("submit", async e => {
   if ($("company").value) { showDone(); return; }   // a bot filled the hidden field
   const t = PAID[tier()], paid = !!t;
   if (!ENDPOINT){ $("formerr").textContent = "Sign-ups aren't connected yet."; return; }
+  if (LOCAL){ $("formerr").textContent = paid ? `Preview: nothing saved. The live page would open the ${t.price} Stripe checkout here.` : ""; if (!paid) showDone(); return; }
   if (paid && !/^https:\/\/buy\.stripe\.com\/[A-Za-z0-9_]+$/.test(t.link)){ $("formerr").textContent = "That option isn't open yet. Join the free waitlist for now."; return; }
 
   const body = new URLSearchParams({
