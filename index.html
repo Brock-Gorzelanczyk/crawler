@@ -6,9 +6,9 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Crawler and the Brain · BMG Capital</title>
-<meta name="description" content="A web crawler that reads any document cover to cover, tags every number to its page, and feeds an Obsidian brain that connects every read. Join the waitlist or get the blueprint.">
+<meta name="description" content="A web crawler that reads any document cover to cover, tags every number to its page, and feeds an Obsidian brain that connects every read. Join the waitlist free, or get founding access: the whole system, built and ready to run.">
 <meta property="og:title" content="The Crawler and the Brain · BMG Capital">
-<meta property="og:description" content="A crawler that reads any document cover to cover and a brain that connects every read. Get the blueprint.">
+<meta property="og:description" content="A crawler that reads any document cover to cover and a brain that connects every read. Founding access: the whole system, built and ready to run.">
 <meta property="og:image" content="assets/crawler-poster.jpg?v=7e10184f">
 <meta name="theme-color" content="#05070c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,6 +53,11 @@
     box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(255,61,166,.10)}
   @media(max-width:760px){.screen{aspect-ratio:9/16;width:min(360px,86vw);margin:0 auto;border-radius:28px}}   /* phones get the tall tour (app.js) */
   .screen .clip{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .found .why{font-size:19px;margin:28px 0 10px}
+  .whys{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  .whys li{color:var(--muted);font-size:15px;line-height:1.5;padding-left:22px;position:relative}
+  .whys li::before{content:"✓";position:absolute;left:0;color:var(--pink,#ff3da6);font-weight:700}
+  .whys li b{color:var(--text)}
   .found .fine{color:var(--muted);font-size:14px;margin:16px 0 0}
   .gets{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:10px;grid-template-columns:1fr}
   @media(min-width:640px){.gets{grid-template-columns:1fr 1fr 1fr}}
@@ -153,7 +158,7 @@
       <div id="formwrap">
         <div class="count"><i></i>Waitlist open</div>
         <h2>Get early access</h2>
-        <p class="sub">Join free to follow along, or get founding access for $50 and build your own today.</p>
+        <p class="sub">Join free to follow along, or get founding access for $50 and start reading today.</p>
 
         <form id="wl" novalidate>
           <div class="field">
@@ -181,10 +186,10 @@
               </tbody>
             </table>
             <div class="opts">
-              <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Watch what I build: texts when the crawler opens up, plus new videos.</span></div></label>
-              <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Founding access <em class="tag paid">$50</em></b><span>Build it yourself, now: the crawler, the Obsidian brain and Record mode, the step-by-step guide, email help and every future update. One payment, yours to keep. Founding price: it goes up later.</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Follow along: texts when the crawler opens up, plus new videos. You wait for launch, at launch price.</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Founding access <em class="tag paid">$50</em></b><span>The whole system, built and ready to run: the crawler, the Obsidian brain and Record mode, with a step-by-step install guide. Start reading today, get every update free and email help from me. One payment, yours to keep.</span></div></label>
             </div>
-            <p class="terms" id="terms">You get the blueprint by email <span id="ship-line"></span> after you pay. Payment is handled securely by Stripe; we never see your card.</p>
+            <p class="terms" id="terms">You get the files and the install guide by email <span id="ship-line"></span> after you pay. Payment is handled securely by Stripe; we never see your card.</p>
           </fieldset>
 
           <div class="hp" aria-hidden="true"><label for="company">Company</label><input id="company" name="company" tabindex="-1" autocomplete="off"></div>
@@ -207,17 +212,24 @@
 
     <section class="found" aria-labelledby="found-h">
       <p class="eyebrow">Founding access · $50</p>
-      <h2 id="found-h">Get the blueprint.</h2>
-      <p class="lede">Everything you need to set up exactly what I set up: the files and the step-by-step guide. Point it at whatever you want read: filings, reports, research, contracts, anything.</p>
+      <h2 id="found-h">Get the whole system.</h2>
+      <p class="lede">The same crawler, brain and Record mode I use in every video, already built. Install it with the guide and start reading today: filings, reports, research, contracts, anything.</p>
       <ul class="gets">
         <li><b>The crawler</b><span>And the live view you see in the videos.</span></li>
         <li><b>The Obsidian brain</b><span>And the 3D map it powers.</span></li>
         <li><b>Record mode</b><span>Turn any read into a video like mine.</span></li>
-        <li><b>The setup guide</b><span>Step by step, in the order I built it.</span></li>
+        <li><b>The install guide</b><span>Step by step, from download to your first read.</span></li>
         <li><b>Email help</b><span>Stuck on setup? Email me.</span></li>
         <li><b>Every update</b><span>New versions of the files, free.</span></li>
       </ul>
-      <p class="fine">Runs on any computer. No subscription, no AI fees. $50 is the founding price; it goes up later.</p>
+      <h3 class="why">Why founding access instead of the waitlist</h3>
+      <ul class="whys">
+        <li><b>Start today.</b> The waitlist waits for launch. Founding members are reading now.</li>
+        <li><b>Lock in $50.</b> It's the founding price; it goes up after.</li>
+        <li><b>Every update, free.</b> Each new version I build lands in your inbox.</li>
+        <li><b>Help from me.</b> Stuck on install? Email me directly.</li>
+      </ul>
+      <p class="fine">Runs on any computer. No subscription, no AI fees.</p>
     </section>
   </div>
 
