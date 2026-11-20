@@ -13,7 +13,7 @@
  * Then Deploy > New deployment > Web app, Execute as: Me, Who has access: Anyone; the /exec URL is the page's ENDPOINT.
  */
 var WAIT = 'Waitlist', PAID = 'Paid';
-var WAIT_HEAD = ['first_seen', 'last_seen', 'phone', 'email', 'tier', 'source', 'sms_email_consent', 'consent_text', 'page', 'timezone', 'times_submitted'];
+var WAIT_HEAD = ['first_seen', 'last_seen', 'phone', 'email', 'tier', 'source', 'sms_email_consent', 'consent_text', 'timezone', 'times_submitted'];
 var VISITS = 'Visits', VIS_HEAD = ['day', 'source', 'visits', 'saw_tour', 'saw_crawler', 'reached_form', 'joined_free', 'started_checkout'];
 var EVENTS = {visit: 2, tour: 3, crawl: 4, form: 5, join: 6, checkout: 7};   // event -> column (0-based) in Visits
 var PAID_HEAD = ['paid_at', 'name', 'email', 'phone', 'amount', 'currency', 'stripe_session', 'payment_link', 'delivered', 'product', 'github'];
@@ -27,6 +27,21 @@ function tab_(name, head) {
   var sh = ss.getSheetByName(name) || ss.insertSheet(name);
   if (sh.getLastRow() === 0) { sh.appendRow(head); sh.setFrozenRows(1); sh.getRange(1, 1, 1, head.length).setFontWeight('bold'); }
   return sh;
+}
+
+// The last row with data in column A. The tabs carry totals boxes to the right of the table, and
+// getLastRow()/appendRow count those too, so new rows would land below the box instead of under the table.
+function lastRow_(sh) {
+  var n = sh.getMaxRows(), c = sh.getRange(n, 1);
+  if (c.getValue() !== '') return n;
+  var r = c.getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
+  return r === 1 && sh.getRange(1, 1).getValue() === '' ? 0 : r;
+}
+// write rows starting at row `at` (adds sheet rows when needed, as appendRow would)
+function putRows_(sh, at, vals) {
+  var need = at + vals.length - 1 - sh.getMaxRows();
+  if (need > 0) sh.insertRowsAfter(sh.getMaxRows(), Math.max(need, 100));
+  sh.getRange(at, 1, vals.length, vals[0].length).setValues(vals);
 }
 
 function clean_(s, n) { return String(s == null ? '' : s).replace(/[\r\n\t]+/g, ' ').trim().slice(0, n || 200); }
@@ -54,11 +69,11 @@ function countEvent_(p) {
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(10000)) return out_({ok: false});
   try {
-    var sh = tab_(VISITS, VIS_HEAD), last = sh.getLastRow();
+    var sh = tab_(VISITS, VIS_HEAD), last = lastRow_(sh);
     var from = Math.max(2, last - 400), rows = last >= 2 ? sh.getRange(from, 1, last - from + 1, 2).getDisplayValues() : [];
     var at = -1;
     for (var i = rows.length - 1; i >= 0; i--) { if (rows[i][0] === day && rows[i][1] === src) { at = from + i; break; } }
-    if (at < 0) { if (last > MAX_ROWS) return out_({ok: false}); sh.appendRow([day, safe_(src), 0, 0, 0, 0, 0, 0]); at = sh.getLastRow(); sh.getRange(at, 1).setNumberFormat('@').setValue(day); }
+    if (at < 0) { if (last > MAX_ROWS) return out_({ok: false}); at = last + 1; putRows_(sh, at, [[day, safe_(src), 0, 0, 0, 0, 0, 0]]); sh.getRange(at, 1).setNumberFormat('@').setValue(day); }
     var cell = sh.getRange(at, col + 1); cell.setValue((+cell.getValue() || 0) + 1);
     return out_({ok: true});
   } finally { lock.releaseLock(); }
@@ -75,7 +90,7 @@ function doPost(e) {
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(10000)) return out_({ok: false});
   try {
-    var sh = tab_(WAIT, WAIT_HEAD), last = sh.getLastRow();
+    var sh = tab_(WAIT, WAIT_HEAD), last = lastRow_(sh);
     if (last > MAX_ROWS) return out_({ok: false});
     var tier = {founding_checkout_started: 'started $50 checkout', investor_checkout_started: 'started $249 checkout'}[p.tier] || 'free';
     var now = new Date();
@@ -87,11 +102,11 @@ function doPost(e) {
       var r = rows[at];
       r[1] = now; r[2] = safe_(phone); r[3] = email;
       if (r[4] !== 'paid' && (tier !== 'free' || !/checkout/.test(r[4]))) r[4] = tier;   // a newer checkout replaces an older one; paid and checkout rows never go back to free
-      r[6] = 'yes'; r[7] = consent; r[10] = (+r[10] || 1) + 1;
+      r[6] = 'yes'; r[7] = consent; r[9] = (+r[9] || 1) + 1;
       sh.getRange(at + 2, 1, 1, WAIT_HEAD.length).setValues([r]);
     } else {
-      sh.appendRow([now, now, safe_(phone), email, tier, safe_(clean_(p.source, 80)), 'yes', consent,
-        safe_(clean_(p.page, 200)), safe_(clean_(p.tz, 60)), 1]);
+      putRows_(sh, last + 1, [[now, now, safe_(phone), email, tier, safe_(clean_(p.source, 80)), 'yes', consent,
+        safe_(clean_(p.tz, 60)), 1]]);
     }
     return out_({ok: true});
   } finally {
@@ -106,7 +121,7 @@ function out_(o) { return ContentService.createTextOutput(JSON.stringify(o)).set
 function syncPaid() {
   var key = PropertiesService.getScriptProperties().getProperty('STRIPE_KEY');
   if (!key) throw new Error('Add STRIPE_KEY (a restricted, read-only key) in Project Settings > Script properties');
-  var sh = tab_(PAID, PAID_HEAD), last = sh.getLastRow();
+  var sh = tab_(PAID, PAID_HEAD), last = lastRow_(sh);
   if (sh.getRange(1, 10).getValue() !== 'product') sh.getRange(1, 1, 1, PAID_HEAD.length).setValues([PAID_HEAD]).setFontWeight('bold');   // older tab: add the new columns
   var seen = {};
   if (last > 1) sh.getRange(2, 7, last - 1, 1).getValues().forEach(function (r) { seen[r[0]] = 1; });
@@ -132,7 +147,7 @@ function syncPaid() {
   }
   if (add.length) {
     add.sort(function (a, b) { return a[0] - b[0]; });
-    sh.getRange(sh.getLastRow() + 1, 1, add.length, PAID_HEAD.length).setValues(add);
+    putRows_(sh, last + 1, add);
     markPaidOnWaitlist_(add);
   }
   if (newest > since) props.setProperty('PAID_SINCE', String(newest - 3600));   // an hour of overlap; duplicates are skipped by session id
@@ -141,7 +156,7 @@ function syncPaid() {
 
 // a buyer who signed up on the page first: their Waitlist row says "paid"
 function markPaidOnWaitlist_(add) {
-  var sh = tab_(WAIT, WAIT_HEAD), last = sh.getLastRow();
+  var sh = tab_(WAIT, WAIT_HEAD), last = lastRow_(sh);
   if (last < 2) return;
   var emails = {};
   add.forEach(function (r) { if (r[2]) emails[r[2]] = 1; });
@@ -222,7 +237,7 @@ function deliveryEmail_(product, name, links, gh) {
 function deliverPending_() {
   var props = PropertiesService.getScriptProperties(), since = +(props.getProperty('DELIVER_SINCE') || 0);
   if (!since) return;                                               // automation is off until setupDelivery() runs
-  var sh = tab_(PAID, PAID_HEAD), last = sh.getLastRow(); if (last < 2) return;
+  var sh = tab_(PAID, PAID_HEAD), last = lastRow_(sh); if (last < 2) return;
   var rows = sh.getRange(2, 1, last - 1, PAID_HEAD.length).getValues(), owner = Session.getEffectiveUser().getEmail(), sent = 0;
   for (var i = 0; i < rows.length && sent < 20; i++) {
     var r = rows[i];
