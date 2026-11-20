@@ -7,6 +7,13 @@ if (window.top !== window.self) { try { window.top.location = window.location.hr
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbxHdsnal13aemM0TY9q9-XC2QKrVZQSOW1f_0dDlLeZuQCJOMs3L9LgKoj0UFtCmP0b/exec";
 // Founding access checkout: the Stripe Payment Link for the $50 product (https://buy.stripe.com/...).
 const STRIPE_LINK = "https://buy.stripe.com/aFa7sL1cAcJSg7V6wNfMA01";
+// Investor Edition checkout: the Stripe Payment Link for the $249 product.
+const INVESTOR_LINK = "https://buy.stripe.com/6oU6oHf3qdNWbRF08pfMA02";
+// the paid tiers: checkout link, price on the button, what the Sheet's tier column gets, what the email brings
+const PAID = {
+  founding: {link: STRIPE_LINK, price: "$50", sheet: "founding_checkout_started", what: "the files and the install guide", cls: "paid"},
+  investor: {link: INVESTOR_LINK, price: "$249", sheet: "investor_checkout_started", what: "the files, the filled brain and the install guide", cls: "inv"}
+};
 // How soon a buyer gets the generic crawler after paying. Shown on the page.
 const DELIVERY = "within 24 hours";
 const CONSENT_TEXT = "I agree to get texts and emails from BMG Capital about the web crawler at the number and address above, including by automated means. Up to 4 msgs/month. Consent is not a condition of purchase. Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
@@ -49,10 +56,12 @@ $("ship-line").textContent = DELIVERY;
 // the button and the pre-order terms follow the choice
 const tier = () => (form.querySelector("input[name=tier]:checked") || {}).value || "waitlist";
 function drawTier(){
-  const paid = tier() === "founding", btn = $("go");
-  $("terms").classList.toggle("on", paid);
-  btn.classList.toggle("paid", paid);
-  btn.textContent = paid ? "Continue to payment · $50" : "Join the waitlist";
+  const t = PAID[tier()], btn = $("go");
+  $("terms").classList.toggle("on", !!t);
+  if (t) $("ship-what").textContent = t.what;
+  btn.classList.toggle("paid", !!t && t.cls === "paid");
+  btn.classList.toggle("inv", !!t && t.cls === "inv");
+  btn.textContent = t ? "Continue to payment · " + t.price : "Join the waitlist";
 }
 form.addEventListener("change", e => { if (e.target.name === "tier") drawTier(); });
 drawTier();
@@ -84,13 +93,13 @@ form.addEventListener("submit", async e => {
   if (!$("consent").checked){ $("formerr").textContent = "Tick the box to agree to texts and emails."; bad = true; }
   if (bad) return;
   if ($("company").value) { showDone(); return; }   // a bot filled the hidden field
-  const paid = tier() === "founding";
+  const t = PAID[tier()], paid = !!t;
   if (!ENDPOINT){ $("formerr").textContent = "Sign-ups aren't connected yet."; return; }
-  if (paid && !/^https:\/\/buy\.stripe\.com\/[A-Za-z0-9_]+$/.test(STRIPE_LINK)){ $("formerr").textContent = "Founding access isn't open yet. Join the free waitlist for now."; return; }
+  if (paid && !/^https:\/\/buy\.stripe\.com\/[A-Za-z0-9_]+$/.test(t.link)){ $("formerr").textContent = "That option isn't open yet. Join the free waitlist for now."; return; }
 
   const body = new URLSearchParams({
     phone, email,
-    tier: paid ? "founding_checkout_started" : "waitlist",
+    tier: paid ? t.sheet : "waitlist",
     consent: "yes", consent_text: CONSENT_TEXT,
     source: new URLSearchParams(location.search).get("src") || (document.referrer ? new URL(document.referrer).hostname : "direct"),
     page: location.href.split("?")[0],
@@ -104,7 +113,7 @@ form.addEventListener("submit", async e => {
     ev(paid ? "checkout" : "join");
     if (paid) {
       // no email or phone in the address: Stripe asks for both itself, and the Sheet's Paid tab matches buyers by email
-      location.href = STRIPE_LINK;
+      location.href = t.link;
       return;
     }
     showDone();

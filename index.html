@@ -17,7 +17,7 @@
 <style>
   :root{
     --bg:#05070c; --panel:#0d1118; --line:#1d2531; --text:#eef2f7; --muted:#8b95a5;
-    --cyan:#6ff4ff; --pink:#ff3da6; --green:#2fdc74; --err:#ff6b6b;
+    --cyan:#6ff4ff; --pink:#ff3da6; --gold:#ffc24d; --green:#2fdc74; --err:#ff6b6b;
     --r:16px;
   }
   *{box-sizing:border-box}
@@ -89,6 +89,7 @@
   .vs td:first-child{text-align:left}
   .vs td:nth-child(2){color:var(--muted)}
   .vs .pd{color:var(--pink);font-weight:700}
+  .vs .iv{color:var(--gold);font-weight:700}
   .opts{display:grid;gap:8px}
   .opt{display:flex;gap:12px;align-items:flex-start;border:1px solid #2a3442;border-radius:12px;padding:12px 14px;cursor:pointer;background:#070a10;transition:border-color .15s,background .15s}
   .opt:has(input:checked){border-color:var(--cyan);background:rgba(111,244,255,.06)}
@@ -100,6 +101,11 @@
   .tag.paid{color:#fff;background:rgba(255,61,166,.22)}
   .opt:has(input[value=founding]:checked){border-color:var(--pink);background:rgba(255,61,166,.07)}
   .opt input[value=founding]{accent-color:var(--pink)}
+  .tag.inv{color:#1a1200;background:var(--gold)}
+  .opt:has(input[value=investor]:checked){border-color:var(--gold);background:rgba(255,194,77,.07)}
+  .opt input[value=investor]{accent-color:var(--gold)}
+  button.inv{background:var(--gold);color:#1a1200;box-shadow:0 10px 30px rgba(255,194,77,.28)}
+  .found .inv-h{color:var(--gold)}
   .terms{display:none;font-size:12.5px;color:var(--muted);margin:10px 2px 0;line-height:1.45}
   .terms.on{display:block}
   button.paid{background:var(--pink);color:#fff;box-shadow:0 10px 30px rgba(255,61,166,.3)}
@@ -165,7 +171,7 @@
       <div id="formwrap">
         <div class="count"><i></i>Waitlist open</div>
         <h2>Get early access</h2>
-        <p class="sub">Join free to follow along, or get founding access for $50 and start reading today.</p>
+        <p class="sub">Join free to follow along, get founding access for $50 and start reading today, or get the Investor Edition for $249 with the brain already filled.</p>
 
         <form id="wl" novalidate>
           <div class="field">
@@ -181,22 +187,26 @@
 
           <fieldset>
             <legend>Pick one</legend>
-            <table class="vs" aria-label="Free waitlist compared with founding access">
-              <thead><tr><th></th><th>Free</th><th class="pd">$50</th></tr></thead>
+            <table class="vs" aria-label="Free waitlist compared with founding access and the Investor Edition">
+              <thead><tr><th></th><th>Free</th><th class="pd">$50</th><th class="iv">$249</th></tr></thead>
               <tbody>
-                <tr><td>Updates and new crawler videos</td><td>✓</td><td class="pd">✓</td></tr>
-                <tr><td>The crawler, the brain and the 3D map, today</td><td>–</td><td class="pd">✓</td></tr>
-                <tr><td>Record mode: make crawler videos like mine</td><td>–</td><td class="pd">✓</td></tr>
-                <tr><td>Step-by-step setup guide, plus email help</td><td>–</td><td class="pd">✓</td></tr>
-                <tr><td>Every future update to the files</td><td>–</td><td class="pd">✓</td></tr>
-                <tr><td>Runs on your computer: no subscription, no AI fees</td><td>–</td><td class="pd">✓</td></tr>
+                <tr><td>Updates and new crawler videos</td><td>✓</td><td class="pd">✓</td><td class="iv">✓</td></tr>
+                <tr><td>The crawler, the brain and the 3D map, today</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
+                <tr><td>Record mode: make crawler videos like mine</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
+                <tr><td>Step-by-step setup guide, plus email help</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
+                <tr><td>Every future update to the files</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
+                <tr><td>Runs on your computer: no subscription, no AI fees</td><td>–</td><td class="pd">✓</td><td class="iv">✓</td></tr>
+                <tr><td>The brain already filled: 400+ S&amp;P 500 companies read from their 10-Ks</td><td>–</td><td>–</td><td class="iv">✓</td></tr>
+                <tr><td>Comp sets, KPIs, industry and sector pages, every number tagged to its filing page</td><td>–</td><td>–</td><td class="iv">✓</td></tr>
+                <tr><td>12 months of data updates as new filings come out</td><td>–</td><td>–</td><td class="iv">✓</td></tr>
               </tbody>
             </table>
             <div class="opts">
               <label class="opt"><input type="radio" name="tier" value="waitlist" checked><div><b>Join the waitlist <em class="tag free">Free</em></b><span>Follow along: texts when the crawler opens up, plus new videos. You wait for launch, at launch price.</span></div></label>
               <label class="opt"><input type="radio" name="tier" value="founding"><div><b>Founding access <em class="tag paid">$50</em></b><span>The whole system, built and ready to run: the crawler, the Obsidian brain and Record mode, with a step-by-step install guide. Start reading today, get every update free and email help from me. One payment, yours to keep.</span></div></label>
+              <label class="opt"><input type="radio" name="tier" value="investor"><div><b>Investor Edition <em class="tag inv">$249</em></b><span>Everything in founding access, plus the brain already filled: 400+ S&amp;P 500 companies read from their 10-Ks, with comp sets, KPIs, industry and sector pages, every number tagged to its filing page. 12 months of data updates included; after that, $99 a year if you want them. Yours to keep either way.</span></div></label>
             </div>
-            <p class="terms" id="terms">You get the files and the install guide by email <span id="ship-line"></span> after you pay. Payment is handled securely by Stripe; we never see your card.</p>
+            <p class="terms" id="terms">You get <span id="ship-what">the files and the install guide</span> by email <span id="ship-line"></span> after you pay. Payment is handled securely by Stripe; we never see your card.</p>
           </fieldset>
 
           <div class="hp" aria-hidden="true"><label for="company">Company</label><input id="company" name="company" tabindex="-1" autocomplete="off"></div>
@@ -237,6 +247,13 @@
         <li><b>Help from me.</b> Stuck on install? Email me directly.</li>
       </ul>
       <p class="fine">Runs on any computer. No subscription, no AI fees.</p>
+      <h3 class="why inv-h">Investor Edition · $249: skip the reading</h3>
+      <ul class="whys">
+        <li><b>The brain, already filled.</b> 400+ S&amp;P 500 companies read from their 10-Ks, ready the day you install.</li>
+        <li><b>Comps and KPIs built in.</b> Industry and sector pages, comp sets and KPIs, every number tagged to its filing page.</li>
+        <li><b>A year of data updates.</b> New filings read and sent to you for 12 months; after that, $99 a year if you want them.</li>
+        <li><b>Everything in founding access.</b> The crawler, Record mode, the install guide and email help.</li>
+      </ul>
     </section>
   </div>
 
@@ -248,6 +265,6 @@
 
 <a class="cta" id="cta" href="#join">Get the crawler <span aria-hidden="true">↓</span></a>
 
-<script src="app.js?v=1e97ecda"></script>
+<script src="app.js?v=6defed21"></script>
 </body>
 </html>

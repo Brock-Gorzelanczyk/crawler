@@ -1,7 +1,7 @@
 /**
  * Web crawler sign-ups -> this Google Sheet, in two tabs:
- *   Waitlist : everyone who signs up on the page (free list). Someone who clicked the $50 option shows
- *              "started $50 checkout" in the tier column until Stripe confirms they paid.
+ *   Waitlist : everyone who signs up on the page (free list). Someone who clicked a paid option shows
+ *              "started $50 checkout" or "started $249 checkout" in the tier column until Stripe confirms they paid.
  *   Visits   : how many people the page reached, one row per day and source (?src=): visits, saw the tour clip,
  *              saw the crawler clip, reached the form, joined free, started checkout. Counts only: no phone, email,
  *              IP, cookie or device id is ever sent or kept.
@@ -77,7 +77,7 @@ function doPost(e) {
   try {
     var sh = tab_(WAIT, WAIT_HEAD), last = sh.getLastRow();
     if (last > MAX_ROWS) return out_({ok: false});
-    var tier = p.tier === 'founding_checkout_started' ? 'started $50 checkout' : 'free';
+    var tier = {founding_checkout_started: 'started $50 checkout', investor_checkout_started: 'started $249 checkout'}[p.tier] || 'free';
     var now = new Date();
     var rows = last > 1 ? sh.getRange(2, 1, last - 1, WAIT_HEAD.length).getValues() : [];
     var at = -1;
@@ -86,7 +86,7 @@ function doPost(e) {
     if (at >= 0) {
       var r = rows[at];
       r[1] = now; r[2] = safe_(phone); r[3] = email;
-      if (!/checkout|^paid$/.test(r[4])) r[4] = tier;           // a checkout or paid row is never set back to free
+      if (r[4] !== 'paid' && (tier !== 'free' || !/checkout/.test(r[4]))) r[4] = tier;   // a newer checkout replaces an older one; paid and checkout rows never go back to free
       r[6] = 'yes'; r[7] = consent; r[10] = (+r[10] || 1) + 1;
       sh.getRange(at + 2, 1, 1, WAIT_HEAD.length).setValues([r]);
     } else {
