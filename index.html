@@ -117,6 +117,13 @@
   .done p{color:var(--muted);margin:0}
   .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
   footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
+  .cta{display:none}
+  @media(max-width:760px){
+    .cta{display:flex;align-items:center;justify-content:center;gap:8px;position:fixed;z-index:50;left:16px;right:16px;bottom:calc(14px + env(safe-area-inset-bottom));
+      height:54px;border-radius:14px;background:var(--cyan);color:#00202a;font:800 18px Inter,sans-serif;text-decoration:none;
+      box-shadow:0 10px 30px rgba(0,0,0,.55),0 0 24px rgba(111,244,255,.35);transition:opacity .2s,transform .2s}
+    .cta.off{opacity:0;transform:translateY(24px);pointer-events:none}
+  }
 </style>
 </head>
 <body>
@@ -239,6 +246,8 @@
   </footer>
 </div>
 
-<script src="app.js?v=e9da22c4"></script>
+<a class="cta" id="cta" href="#join">Get the crawler <span aria-hidden="true">↓</span></a>
+
+<script src="app.js?v=1e97ecda"></script>
 </body>
 </html>

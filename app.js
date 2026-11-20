@@ -36,6 +36,16 @@ if ("IntersectionObserver" in window) {
 }
 $("ship-line").textContent = DELIVERY;
 
+// phones: the pinned "Get the crawler" button shows from the first screen and goes away once the sign-up card is on screen
+(() => {
+  const cta = $("cta"), card = $("join"); if (!cta || !card) return;
+  let queued = false;
+  const draw = () => { queued = false; cta.classList.toggle("off", card.getBoundingClientRect().top < innerHeight - 90); };
+  const ask = () => { if (!queued) { queued = true; requestAnimationFrame(draw); } };
+  addEventListener("scroll", ask, {passive: true}); addEventListener("resize", ask); draw();
+  cta.addEventListener("click", e => { e.preventDefault(); card.scrollIntoView({behavior: "smooth", block: "start"}); });
+})();
+
 // the button and the pre-order terms follow the choice
 const tier = () => (form.querySelector("input[name=tier]:checked") || {}).value || "waitlist";
 function drawTier(){
