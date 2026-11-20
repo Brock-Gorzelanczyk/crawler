@@ -263,3 +263,17 @@ function deliveryTest() {
   });
   return 'sent 2 test emails to ' + owner;
 }
+
+// checks GITHUB_TOKEN can manage both product repos (needed to invite buyers). Changes nothing.
+function githubTokenTest() {
+  var props = PropertiesService.getScriptProperties(), token = props.getProperty('GITHUB_TOKEN'), out = [];
+  ['KIT_REPO', 'INVESTOR_REPO'].forEach(function (k) {
+    var repo = props.getProperty(k);
+    var res = UrlFetchApp.fetch('https://api.github.com/repos/' + repo, {muteHttpExceptions: true,
+      headers: {Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}});
+    var body = {}; try { body = JSON.parse(res.getContentText()); } catch (e) {}
+    out.push(k + ' ' + repo + ': HTTP ' + res.getResponseCode() + (body.permissions ? ', admin=' + body.permissions.admin + ', private=' + body.private : ' ' + (body.message || '')));
+  });
+  Logger.log(out.join('\n'));
+  return out.join('\n');
+}
